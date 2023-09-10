@@ -2,10 +2,10 @@ server:
   port: 8081
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/eat
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:tcp://localhost/~/eat
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
 #    url: localhost
 #    username: user
 #    password: 1234
