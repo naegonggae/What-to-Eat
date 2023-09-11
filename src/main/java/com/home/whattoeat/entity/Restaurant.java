@@ -21,6 +21,6 @@ public class Restaurant {
 	private String cuisineType; // enum
 
 	@OneToMany(mappedBy = "menu")
-	private List<Menus> menusList = new ArrayList<>();
+	private List<Menu> menuList = new ArrayList<>();
 
 }

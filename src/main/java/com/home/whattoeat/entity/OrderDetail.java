@@ -12,7 +12,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class OrderDetails {
+public class OrderDetail {
 
 	@Id @GeneratedValue
 	@Column(name = "orderDetail_id")
@@ -23,7 +23,7 @@ public class OrderDetails {
 	private Order order;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "menu_id")
-	private Menus menus;
+	private Menu menu;
 	private String quantity;
 
 }

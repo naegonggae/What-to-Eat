@@ -13,7 +13,6 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,7 +30,7 @@ public class Order {
 //	@Column(name = "restaurant_id")
 //	private Restaurant restaurant;
 	@OneToMany(mappedBy = "order_id")
-	private List<OrderDetails> orderDetailsList = new ArrayList<>();
+	private List<OrderDetail> orderDetailList = new ArrayList<>();
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id")
 	private Delivery delivery;
