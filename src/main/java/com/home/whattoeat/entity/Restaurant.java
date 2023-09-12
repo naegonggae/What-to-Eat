@@ -20,7 +20,7 @@ public class Restaurant {
 	private String phoneNumber;
 	private String cuisineType; // enum
 
-	@OneToMany(mappedBy = "menu")
+	@OneToMany(mappedBy = "restaurant")
 	private List<Menu> menuList = new ArrayList<>();
 
 }

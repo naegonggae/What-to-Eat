@@ -18,7 +18,7 @@ public class Category {
 	@Column(name = "category_id")
 	private Long id;
 	private String name;
-	@OneToMany(mappedBy = "menu")
-	private List<Category> categoryList = new ArrayList<>();
+	@OneToMany(mappedBy = "category")
+	private List<Menu> menuList = new ArrayList<>();
 
 }

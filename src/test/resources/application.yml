@@ -7,7 +7,7 @@ spring:
 #    password:
 #    driver-class-name: org.h2.Driver
 #    url: localhost
-#    username: user
+#    username: member
 #    password: 1234
 #    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
