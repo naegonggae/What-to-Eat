@@ -91,6 +91,9 @@ public class MemberService {
 				.orElseThrow(NoSuchMemberException::new);
 
 		// 여기에 삭제하기 전에 날짜를 표시할건지 아니면 배송중인 음식이 있는지 등 확인
+		// 음식점과 메뉴들이 삭제 되는데 괜찮냐
+		// 진행중인 배송이 있는 체크
+		// 이벤트 체크
 
 		// 직접삭제
 //		memberRepository.delete(findMember);
