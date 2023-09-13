@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "orders")
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Order {
+public class Order extends BaseEntity {
 
 	@Id @GeneratedValue
 	@Column(name = "order_id")

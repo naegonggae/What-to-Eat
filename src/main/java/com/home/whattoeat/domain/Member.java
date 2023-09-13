@@ -14,16 +14,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.hibernate.annotations.Where;
 
 @Entity @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Member {
+@ToString
+public class Member extends BaseEntity {
 
 	@Id
 	@GeneratedValue
-	@Column(name = "user_id")
+	@Column(name = "member_id")
 	private Long id;
 
 	private String username;

@@ -14,7 +14,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class Delivery {
+public class Delivery extends BaseEntity {
 
 	@Id @GeneratedValue
 	@Column(name = "deliver_id")

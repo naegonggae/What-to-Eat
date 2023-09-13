@@ -10,7 +10,10 @@ import com.home.whattoeat.exception.member.DuplicateEmailException;
 import com.home.whattoeat.exception.member.DuplicateUsernameException;
 import com.home.whattoeat.exception.member.NoSuchMemberException;
 import com.home.whattoeat.repository.MemberRepository;
+import jakarta.persistence.EntityManager;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
+
+	@Autowired
+	EntityManager em;
 
 	// 회원가입
 	@Transactional
@@ -85,7 +91,22 @@ public class MemberService {
 				.orElseThrow(NoSuchMemberException::new);
 
 		// 여기에 삭제하기 전에 날짜를 표시할건지 아니면 배송중인 음식이 있는지 등 확인
-		memberRepository.delete(findMember);
+
+		// 직접삭제
+//		memberRepository.delete(findMember);
+
+		// 소프트 삭제
+		findMember.softDelete();
+//		memberRepository.saveAndFlush(findMember);
+//		em.flush();
+//		em.clear();
+//		if (em.contains(findMember)) {
+//			// 엔티티가 영속성 컨텍스트에 존재하는 경우
+////			em.evict(findMember); // 영속성 컨텍스트에서 제거
+//			System.out.println("아직 캐시에 남아있소");
+//		}
+//		Member member = memberRepository.findById(findMember.getId()).orElseThrow();
+//		System.out.println(member.getDeletedAt());
 	}
 
 	// 비밀번호 변경

@@ -11,7 +11,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class Restaurant {
+public class Restaurant extends BaseEntity {
 
 	@Id @GeneratedValue
 	@Column(name = "restaurant_id")

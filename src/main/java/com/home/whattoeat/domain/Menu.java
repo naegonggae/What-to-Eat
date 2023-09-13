@@ -13,7 +13,7 @@ import lombok.Getter;
 @Entity
 @Table(name = "menus")
 @Getter
-public class Menu {
+public class Menu extends BaseEntity {
 
 	@Id @GeneratedValue
 	@Column(name = "menus_id")

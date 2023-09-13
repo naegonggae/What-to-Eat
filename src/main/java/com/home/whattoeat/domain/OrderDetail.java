@@ -12,7 +12,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class OrderDetail {
+public class OrderDetail extends BaseEntity {
 
 	@Id @GeneratedValue
 	@Column(name = "orderDetail_id")
