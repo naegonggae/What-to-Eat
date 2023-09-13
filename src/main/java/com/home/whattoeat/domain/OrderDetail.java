@@ -1,5 +1,6 @@
-package com.home.whattoeat.entity;
+package com.home.whattoeat.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -7,26 +8,22 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.Getter;
 
 @Entity
-@Table(name = "menus")
 @Getter
-public class Menu {
+public class OrderDetail {
 
 	@Id @GeneratedValue
-	@Column(name = "menus_id")
+	@Column(name = "orderDetail_id")
 	private Long id;
-	private String name;
-	private String description;
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "restaurant_id")
-	private Restaurant restaurant;
-	private int price;
+	@JoinColumn(name = "order_id")
+	private Order order;
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id")
-	private Category category;
-
+	@JoinColumn(name = "menu_id")
+	private Menu menu;
+	private String quantity;
 
 }

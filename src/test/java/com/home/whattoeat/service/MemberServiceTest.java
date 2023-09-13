@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import com.home.whattoeat.dto.member.MemberSaveRequest;
 import com.home.whattoeat.dto.member.MemberSaveResponse;
 import com.home.whattoeat.dto.member.MemberUpdateRequest;
-import com.home.whattoeat.entity.Member;
+import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.exception.member.DuplicateEmailException;
 import com.home.whattoeat.exception.member.DuplicateUsernameException;
 import com.home.whattoeat.repository.MemberRepository;

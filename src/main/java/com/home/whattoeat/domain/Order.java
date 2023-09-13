@@ -1,4 +1,4 @@
-package com.home.whattoeat.entity;
+package com.home.whattoeat.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

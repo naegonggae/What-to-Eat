@@ -1,4 +1,4 @@
-package com.home.whattoeat.entity;
+package com.home.whattoeat.domain;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

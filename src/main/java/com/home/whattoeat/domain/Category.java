@@ -1,4 +1,4 @@
-package com.home.whattoeat.entity;
+package com.home.whattoeat.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Generated;
 import lombok.Getter;
 
 @Entity

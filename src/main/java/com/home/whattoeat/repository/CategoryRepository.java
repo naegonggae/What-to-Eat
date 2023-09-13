@@ -1,6 +1,6 @@
 package com.home.whattoeat.repository;
 
-import com.home.whattoeat.entity.Category;
+import com.home.whattoeat.domain.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {

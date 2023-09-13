@@ -1,6 +1,6 @@
 package com.home.whattoeat.dto.member;
 
-import com.home.whattoeat.entity.Member;
+import com.home.whattoeat.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

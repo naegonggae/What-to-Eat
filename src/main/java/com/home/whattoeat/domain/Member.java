@@ -1,4 +1,4 @@
-package com.home.whattoeat.entity;
+package com.home.whattoeat.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.home.whattoeat.dto.member.MemberUpdateRequest;

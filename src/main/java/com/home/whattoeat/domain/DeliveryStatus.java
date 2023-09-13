@@ -1,4 +1,4 @@
-package com.home.whattoeat.entity;
+package com.home.whattoeat.domain;
 
 public enum DeliveryStatus {
 	READY, COMP
