@@ -6,12 +6,11 @@ import com.home.whattoeat.dto.restuarant.RstSaveRequest;
 import com.home.whattoeat.dto.restuarant.RstSaveResponse;
 import com.home.whattoeat.dto.restuarant.RstUpdateRequest;
 import com.home.whattoeat.service.RestaurantService;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.PackagePrivate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/rsts")
+@RequestMapping("/api/v1/restaurants")
 @RequiredArgsConstructor
-public class RstRestController {
+public class RestaurantRestController {
 
 	private final RestaurantService restaurantService;
 
@@ -41,8 +40,8 @@ public class RstRestController {
 	}
 
 	@PostMapping
-	public ResponseEntity<RstSaveResponse> save(@RequestBody RstSaveRequest request, String username) {
-		RstSaveResponse rstSaveResponse = restaurantService.save(request, username);
+	public ResponseEntity<RstSaveResponse> save(@RequestBody RstSaveRequest request, Authentication authentication) {
+		RstSaveResponse rstSaveResponse = restaurantService.save(request, authentication.getName());
 		return ResponseEntity.ok().body(rstSaveResponse);// 이거 201코드 보내야하는데
 	}
 

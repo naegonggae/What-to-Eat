@@ -21,7 +21,7 @@ import org.hibernate.annotations.Where;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+//@ToString 이거 왜 안되는지 확인
 public class Member extends BaseEntity {
 
 	@Id

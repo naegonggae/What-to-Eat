@@ -11,20 +11,23 @@ import com.home.whattoeat.exception.member.DuplicateUsernameException;
 import com.home.whattoeat.exception.member.NoSuchMemberException;
 import com.home.whattoeat.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
 	private final MemberRepository memberRepository;
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
 	EntityManager em;
@@ -42,9 +45,10 @@ public class MemberService {
 		// 이메일 형식 체크해야하나
 		// 저장 근데 member 저장할때는 받을 수 있는건 다 입력받아야하는거 아님?
 		// 패스워드 암호화
+		String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
 		Member member = Member.builder()
 				.username(request.getUsername())
-				.password(request.getPassword())
+				.password(encodedPassword)
 				.email(request.getEmail())
 				.build();
 

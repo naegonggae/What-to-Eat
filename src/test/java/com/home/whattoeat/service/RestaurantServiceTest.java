@@ -2,7 +2,6 @@ package com.home.whattoeat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,27 +14,21 @@ import com.home.whattoeat.dto.restuarant.RstFindOneResponse;
 import com.home.whattoeat.dto.restuarant.RstSaveRequest;
 import com.home.whattoeat.dto.restuarant.RstSaveResponse;
 import com.home.whattoeat.exception.member.NoSuchMemberException;
-import com.home.whattoeat.exception.reataurant.NoSuchRstException;
+import com.home.whattoeat.exception.reataurant.NoSuchRestaurantException;
 import com.home.whattoeat.repository.MemberRepository;
 import com.home.whattoeat.repository.RestaurantRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 
 @ExtendWith(MockitoExtension.class)
 class RestaurantServiceTest {
@@ -122,10 +115,10 @@ class RestaurantServiceTest {
 
 		Long id = 1L;
 
-		when(restaurantRepository.findById(id)).thenThrow(new NoSuchRstException());
+		when(restaurantRepository.findById(id)).thenThrow(new NoSuchRestaurantException());
 
 		assertThatThrownBy(() -> restaurantService.findOne(id))
-				.isInstanceOf(NoSuchRstException.class)
+				.isInstanceOf(NoSuchRestaurantException.class)
 				.hasMessageContaining("존재하지 않는 음식점입니다.");
 		verify(restaurantRepository, times(1)).findById(id);
 	}

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class AuthExceptionHandler {
-
 	@ExceptionHandler(PasswordMismatchException.class)
 	public ResponseEntity<?> passwordMismatchException(PasswordMismatchException e) {
 		return ResponseEntity.status(e.getStatus())
