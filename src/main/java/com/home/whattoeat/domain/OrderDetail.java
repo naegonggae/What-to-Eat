@@ -25,5 +25,10 @@ public class OrderDetail extends BaseEntity {
 	@JoinColumn(name = "menu_id")
 	private Menu menu;
 	private String quantity;
+	// Unit Price
+	// 총가격
+	// 옵션
+	// 메모
+
 
 }

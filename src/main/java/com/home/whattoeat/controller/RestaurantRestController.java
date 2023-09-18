@@ -28,14 +28,15 @@ public class RestaurantRestController {
 	private final RestaurantService restaurantService;
 
 	@GetMapping("/{id}")
-	public ResponseEntity<RstFindOneResponse> findOne(@PathVariable Long id) {
-		RstFindOneResponse rstFindOneResponse = restaurantService.findOne(id);
+	public ResponseEntity<RstFindOneResponse> findOne(@PathVariable Long id, Authentication authentication) {
+		RstFindOneResponse rstFindOneResponse = restaurantService.findOne(id,
+				authentication.getName());
 		return ResponseEntity.ok().body(rstFindOneResponse);
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<RstFindAllResponse>> findAll(Pageable pageable) {
-		Page<RstFindAllResponse> findAllResponses = restaurantService.findAll(pageable);
+	public ResponseEntity<Page<RstFindAllResponse>> findAll(Pageable pageable, Authentication authentication) {
+		Page<RstFindAllResponse> findAllResponses = restaurantService.findAll(pageable, authentication.getName());
 		return ResponseEntity.ok().body(findAllResponses);
 	}
 
@@ -46,14 +47,14 @@ public class RestaurantRestController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Void> update(@RequestBody RstUpdateRequest request, @PathVariable Long id) {
-		restaurantService.update(id, request);
+	public ResponseEntity<Void> update(@RequestBody RstUpdateRequest request, @PathVariable Long id, Authentication authentication) {
+		restaurantService.update(id, request, authentication.getName());
 		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		restaurantService.delete(id);
+	public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
+		restaurantService.delete(id, authentication.getName());
 		return ResponseEntity.noContent().build();
 	}
 

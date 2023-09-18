@@ -27,5 +27,10 @@ public class MemberExceptionHandler {
 				.body(Response.error(new ErrorResponse(e.getStatus(), e.getStatus().value(), e.getMessage())));
 	}
 
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<?> accessDeniedException(AccessDeniedException e) {
+		return ResponseEntity.status(e.getStatus())
+				.body(Response.error(new ErrorResponse(e.getStatus(), e.getStatus().value(), e.getMessage())));
+	}
 
 }

@@ -22,12 +22,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
 
 	@Mock
 	MemberRepository memberRepository;
+
+	@Mock
+	BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@InjectMocks // mock 들을 의존성 주입해줌
 	private MemberService memberService;
@@ -48,7 +52,7 @@ class MemberServiceTest {
 				.id(1L)
 				.username(memberSaveRequest.getUsername())
 				.email(memberSaveRequest.getEmail())
-				.password(memberSaveRequest.getPassword())
+				.password(bCryptPasswordEncoder.encode(memberSaveRequest.getPassword()))
 				.build();
 
 		when(memberRepository.save(any(Member.class))).thenReturn(savedMember);

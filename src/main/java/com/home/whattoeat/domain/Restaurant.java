@@ -29,6 +29,21 @@ public class Restaurant extends BaseEntity {
 	private String phoneNumber;
 	private String cuisineType; // enum
 
+	private Address address;
+	// 영업시간
+	// 가게 소개
+	// 평균가격
+	// 사진
+	// 예약 가능여부
+	// 위도경도
+	// 평점
+	// 운영자 정보
+	// 온라인 예약 링크, 인스타 링크
+	// 결제 수단
+	// 예약 현황
+	// 운영 중단 일정
+	// 프로모션 정보
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;

@@ -40,5 +40,12 @@ public class Order extends BaseEntity {
 	private String orderTime;
 	private String totalAmount;
 
+	// 배달주소
+	// 주문상태
+	// 배달원
+	// 결제정보
+	// 주문 특이사항
+	// 배달 요청시간
+
 
 }
