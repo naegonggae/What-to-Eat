@@ -51,6 +51,9 @@ public class Restaurant extends BaseEntity {
 	@OneToMany(mappedBy = "restaurant")
 	private List<Menu> menuList = new ArrayList<>();
 
+//	@OneToMany(mappedBy = "restaurant")
+//	private List<RestaurantCategory> categoryList = new ArrayList<>();
+
 	public void update(RstUpdateRequest request) {
 		this.name = request.getName();
 		this.phoneNumber = request.getPhoneNumber();

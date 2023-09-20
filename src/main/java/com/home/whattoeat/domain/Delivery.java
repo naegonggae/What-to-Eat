@@ -22,9 +22,24 @@ public class Delivery extends BaseEntity {
 	@JsonIgnore
 	@OneToOne(mappedBy = "delivery", fetch = FetchType.LAZY)
 	private Order order;
+
+//	@OneToOne(fetch = FetchType.LAZY)
+//	private DeliveryDriver deliveryDriver;
+
+	private String deliveryDriver;
+
 	@Embedded
-	private Address address;
+	private Address deliveryAddress;
 	@Enumerated(EnumType.STRING)
 	private DeliveryStatus deliveryStatus;
 
+	private int estimatedDeliveryTime;
+
+	public void addOrder(Order order) {
+		this.order = order;
+	}
+
+	public void changeStatus() {
+		this.deliveryStatus = DeliveryStatus.READY;
+	}
 }

@@ -21,7 +21,7 @@ import org.hibernate.annotations.Where;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-//@ToString 이거 왜 안되는지 확인
+//@ToString //주문이나 주문상세까지 파고드니까
 public class Member extends BaseEntity {
 
 	@Id
@@ -37,8 +37,9 @@ public class Member extends BaseEntity {
 	private String role; // enum
 	@Embedded
 	private Address address;
+
 	@JsonIgnore
-	@OneToMany(mappedBy = "member")
+	@OneToMany(mappedBy = "member") // 주인이 아님을 표시 Order 에 있는 member 와 연결이 된다는 표시
 	private List<Order> orderList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member")
@@ -55,5 +56,17 @@ public class Member extends BaseEntity {
 		this.email = request.getEmail();
 	}
 
-
+	@Override
+	public String toString() {
+		return "Member{" +
+				"id=" + id +
+				", username='" + username + '\'' +
+				", email='" + email + '\'' +
+				", password='" + password + '\'' +
+				", cardNumber='" + cardNumber + '\'' +
+				", phoneNumber='" + phoneNumber + '\'' +
+				", role='" + role + '\'' +
+				", address=" + address +
+				'}';
+	}
 }
