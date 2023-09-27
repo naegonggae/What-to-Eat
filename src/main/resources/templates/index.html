@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}" />
+<title>Hello</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+  /* 스타일링을 위한 CSS */
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin-top: 0px; /* nav 바의 높이 만큼 마진을 줍니다 */
+    background: linear-gradient(to bottom, #f0f0f0 73%, #ffffff 27%); /* 회색과 흰색 배경색 조합 */
+  }
+
+  .title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    /*background-color: rgba(240, 240, 240, 0.7); !* 밝은 회색 배경색, 투명도 추가 *!*/
+    padding: 10px;
+    width: 100%;
+  }
+
+  .title img {
+    width: 280px;
+    height: 280px;
+    margin: 10px 0; /* 위아래 여백 추가 */
+  }
+
+  .body a {
+    background-color: #00a896; /* 민트색 배경색 */
+    color: #ffffff; /* 흰색 글자색 */
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+<!--  <div th:replace="~{fragments/header}"></div>-->
+  <nav class="navbar bg-dark navbar-expand-lg fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" style="color: white; font-weight: bold;">🍰 뭐먹 Home</a>
+    </div>
+  </nav>
+  <!--  가운데정렬, 위아래 마진4추가-->
+  <div class="text-center title">
+    <img src="https://img.freepik.com/free-vector/hand-drawn-people-eating-collection_23-2149216027.jpg?w=1060&t=st=1695469514~exp=1695470114~hmac=c9879dcd7e0d16d6bbacd7f5f9950f30dadffb632a3c212593c45d72a4bfde47"
+         width="300" height="300" class="rounded-circle my-2">
+    <h1 class="my-2">뭐먹</h1>
+    <p class="lead my-2">안녕하세요. 픽업 주문 서비스 뭐먹입니다!</p>
+  </div>
+  <div class="body text-center mt-2" style="background-color: #ffffff;">
+    <p>
+      <a class="btn btn-lg btn-success" href="/view/auth/login">👉 지금 주문하러 이동하기</a>
+      <!--      <a class="btn btn-lg btn-info my-4" href="/view/auth/login">로그인</a>-->
+    </p>
+  </div>
+
+
+  <!--  <div th:replace="~{fragments/footer :: footer}" />-->
+</div> <!-- /container -->
+</body>
+</html>
