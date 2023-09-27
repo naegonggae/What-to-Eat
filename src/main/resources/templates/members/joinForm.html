@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}"/>
+<style>
+  /* 폼을 화면 가운데로 정렬하고 여백을 추가합니다. */
+  .centered-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0; /* 밝은 회색 배경색 */
+  }
+
+  /* 폼 요소 간의 여백을 조정합니다. */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  /* 입력창 밑에 밑줄을 추가합니다. */
+  .form-control.with-underline {
+    border-bottom: 1px solid #000;
+  }
+</style>
+<body style="background-color: #f0f0f0;">
+<nav class="navbar bg-dark navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" style="color: white; font-weight: bold;">🍰 뭐먹 Home</a>
+  </div>
+</nav>
+<div class="container">
+
+  <div class="centered-form">
+    <form role="form" action="/view/auth/join" th:object="${memberSaveRequest}"
+          method="post">
+      <div class="form-group">
+        <h1 class="text-center my-4">Sign up</h1>
+
+        <label th:for="name">이름</label>
+        <input type="text" th:field="*{username}" class="form-control with-underline" placeholder="이름을 입력하세요"
+               th:class="${#fields.hasErrors('username')}? 'form-controlfieldError' : 'form-control'">
+        <p th:if="${#fields.hasErrors('username')}"
+           th:errors="*{username}">Incorrect date</p>
+      </div>
+      <div class="form-group">
+        <label th:for="email">이메일</label>
+        <input type="text" th:field="*{email}" class="form-control with-underline" placeholder="이메일을 입력하세요">
+      </div>
+      <div class="form-group">
+        <label th:for="password">비밀번호</label>
+        <input type="text" th:field="*{password}" class="form-control with-underline" placeholder="비밀번호를 입력하세요">
+      </div>
+      <button type="submit" class="btn btn-primary form-control with-underline">가입하기</button>
+    </form>
+  </div>
+</div> <!-- /container -->
+</body>
+</html>

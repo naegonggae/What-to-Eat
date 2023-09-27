@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}"/>
+<style>
+  /* 폼을 화면 가운데로 정렬하고 여백을 추가합니다. */
+  .centered-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0; /* 밝은 회색 배경색 */
+  }
+
+  /* 폼 요소 간의 여백을 조정합니다. */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  /* 입력창 밑에 밑줄을 추가합니다. */
+  .form-control.with-underline {
+    border-bottom: 1px solid #000;
+  }
+</style>
+</head>
+<body style="background-color: #f0f0f0;">
+<nav class="navbar bg-dark navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" style="color: white; font-weight: bold;">🍰 뭐먹 Home</a>
+  </div>
+</nav>
+<div class="container"> <!-- 폼을 감싸는 컨테이너에 centered-form 클래스를 추가합니다. -->
+
+  <div class="centered-form">
+    <form role="form" action="/view/auth/login" th:object="${loginRequest}" method="post">
+      <div class="form-group">
+        <h1 class="text-center my-4">Sign in</h1>
+        <label th:for="username">아이디</label>
+        <input type="text" th:field="*{username}" class="form-control with-underline" placeholder="아이디를 입력하세요"
+               th:class="${#fields.hasErrors('username')}? 'form-control fieldError with-underline' : 'form-control with-underline'">
+        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="with-underline">Incorrect date</p>
+      </div>
+      <div class="form-group">
+        <label th:for="password">비밀번호</label>
+        <input type="text" th:field="*{password}" class="form-control with-underline" placeholder="비밀번호를 입력하세요">
+      </div>
+      <button type="submit" class="btn btn-primary form-control with-underline">로그인</button>
+    </form>
+    <div class="my-4">
+      <a href="/">비밀번호를 잊으셨나요?</a>
+    </div>
+    <p>계정이 없으신가요? <a href="/view/auth/join">가입하기</a></p> <!-- 버튼의 링크 속성을 수정합니다. -->
+  </div>
+</div> <!-- /container -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script th:inline="javascript">
+  async function login() {
+
+    let username = $("#username").val();
+    let password = $("#password").val();
+
+    console.log(username, password)
+    await axios.post("/api/v1/auth/login", {
+          "username": username,
+          "password": password,
+        }
+        // {withCredentials: true}
+    ).then(res => {
+      let config = {
+        headers: {
+          "Authorization": "Bearer " + res.data.result.accessToken
+        }
+      }
+      if (res.data.resultCode == 'SUCCESS') {
+        console.log("성공진입")
+        const accessToken  = res.data.result.accessToken;
+        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+        // window.localStorage.setItem("accessToken", res.data.result.accessToken);
+        document.location.href = "/home";
+
+      } else {
+        // localStorage.clear()
+        console.log("아무것도 할게 없어서 그냥 종료")
+        alert('아이디 혹은 비밀번호를 잘못 입력하셨습니다.');
+      }
+    }).catch(err => {
+      let errMsg = err.response.data.result.message;
+
+      if (errMsg === '존재하지 않는 회원입니다.' || errMsg === 'Not founded'){
+        console.log(errMsg)
+        alert('아이디 혹은 비밀번호를 잘못 입력하셨습니다.');
+        let username = document.getElementById('username');
+        let password = document.getElementById('password');
+        username.value = null;
+        password.value = null;
+        // localStorage.clear()
+      }
+    });
+
+    // const accessToken = window.localStorage.getItem("accessToken");
+    if (accessToken != null) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+      document.location.href = "/home";
+      return true;
+    }
+  }
+  // /** 헤더에 토큰값이 없으면 담아줌 */
+  // axios.interceptors.request.use(function (config) {
+  //   console.log("인터셉터 시작")
+  //   const accessToken = localStorage.getItem('accessToken');
+  //
+  //   if (accessToken) {
+  //     config.headers.Authorization = `Bearer ${accessToken}`;
+  //   }
+  //   return config;
+  // })
+
+</script>
+</body>
+</html>

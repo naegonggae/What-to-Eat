@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}" />
+<title>Hello</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+  .circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    /*background: url('https://img.freepik.com/free-vector/fried-chicken-sticker-on-white-background_1308-64467.jpg?w=100') no-repeat center center;*/
+    /*background-size: cover;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin: 10px; /* 위아래와 좌우 간격 조정 */
+  }
+
+  .circle p {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .circle-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  /* 검색창 아래에 여백 추가 */
+  .search-container {
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body style="background-color: #f0f0f0;">
+<div>
+  <div th:replace="~{fragments/header}"></div>
+
+  <div class="container" >
+    <div class="container">
+      <div class="container mt-5">
+        <div class="row">
+          <div class="col-md-6 offset-md-3">
+            <!-- 검색창 아래에 여백 추가 -->
+            <div class="input-group search-container">
+              <input class="form-control" type="text" placeholder="검색어를 입력하세요" aria-label="검색">
+              <div class="input-group-append">
+                <button class="btn btn-outline-success mx-2" type="submit">검색</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    <div class="circle-container">
+      <div class="circle" onclick="window.location.href = '/view/categories/chicken';">
+        <p style="font-weight: bold;">치킨</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">찜 & 탕 & 찌개</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">돈까스 & 회 & 일식</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">피자</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">고기 구이</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">양식</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">족발 & 보쌈</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">중식</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">아시안</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">분식</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">카페 & 디저트</p>
+      </div>
+      <div class="circle" onclick="window.location.href = '링크주소';">
+        <p style="font-weight: bold;">패스트푸드</p>
+      </div>
+    </div>
+
+
+
+    <a class="btn btn-lg btn-secondary" href="/view/members">회원 목록</a>
+
+  </div>
+</div> <!-- /container -->
+</body>
+</html>
