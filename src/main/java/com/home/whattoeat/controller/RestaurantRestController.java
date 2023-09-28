@@ -1,9 +1,12 @@
 package com.home.whattoeat.controller;
 
+import com.home.whattoeat.dto.restuarant.RestaurantCategoryDto;
 import com.home.whattoeat.dto.restuarant.RstFindAllResponse;
+import com.home.whattoeat.dto.restuarant.RstCategoryCondition;
 import com.home.whattoeat.dto.restuarant.RstFindOneResponse;
 import com.home.whattoeat.dto.restuarant.RstSaveRequest;
 import com.home.whattoeat.dto.restuarant.RstSaveResponse;
+import com.home.whattoeat.dto.restuarant.RstSearchCondition;
 import com.home.whattoeat.dto.restuarant.RstUpdateRequest;
 import com.home.whattoeat.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +41,18 @@ public class RestaurantRestController {
 	public ResponseEntity<Page<RstFindAllResponse>> findAll(Pageable pageable, Authentication authentication) {
 		Page<RstFindAllResponse> findAllResponses = restaurantService.findAll(pageable, authentication.getName());
 		return ResponseEntity.ok().body(findAllResponses);
+	}
+
+	@GetMapping("/categories")
+	public ResponseEntity<Page<RestaurantCategoryDto>> findAllByCategory(Pageable pageable, @RequestBody RstCategoryCondition request) {
+		Page<RestaurantCategoryDto> result = restaurantService.findAllByCategory(pageable, request);
+		return ResponseEntity.ok().body(result);
+	}
+
+	@GetMapping("/condition")
+	public ResponseEntity<Page<RestaurantCategoryDto>> findAllByCondition(Pageable pageable, @RequestBody RstSearchCondition request) {
+		Page<RestaurantCategoryDto> result = restaurantService.findAllByCondition(pageable, request);
+		return ResponseEntity.ok().body(result);
 	}
 
 	@PostMapping

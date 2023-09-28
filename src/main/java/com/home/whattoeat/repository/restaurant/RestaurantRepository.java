@@ -1,4 +1,4 @@
-package com.home.whattoeat.repository;
+package com.home.whattoeat.repository.restaurant;
 
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.Restaurant;
@@ -7,9 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
-
-	boolean existsByName(String name);
+public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantRepositoryCustom {
 
 	Optional<Restaurant> findByName(String name);
 	Page<Restaurant> findAllByMember(Member member, Pageable pageable);

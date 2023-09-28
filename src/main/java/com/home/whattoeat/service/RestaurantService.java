@@ -1,17 +1,26 @@
 package com.home.whattoeat.service;
 
+import com.home.whattoeat.domain.Category;
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.Restaurant;
+import com.home.whattoeat.domain.RestaurantCategory;
+import com.home.whattoeat.dto.restuarant.RestaurantCategoryDto;
 import com.home.whattoeat.dto.restuarant.RstFindAllResponse;
+import com.home.whattoeat.dto.restuarant.RstCategoryCondition;
 import com.home.whattoeat.dto.restuarant.RstFindOneResponse;
 import com.home.whattoeat.dto.restuarant.RstSaveRequest;
 import com.home.whattoeat.dto.restuarant.RstSaveResponse;
+import com.home.whattoeat.dto.restuarant.RstSearchCondition;
 import com.home.whattoeat.dto.restuarant.RstUpdateRequest;
+import com.home.whattoeat.exception.category.NoSuchCategoryException;
 import com.home.whattoeat.exception.member.AccessDeniedException;
 import com.home.whattoeat.exception.member.NoSuchMemberException;
 import com.home.whattoeat.exception.reataurant.NoSuchRestaurantException;
+import com.home.whattoeat.repository.CategoryRepository;
 import com.home.whattoeat.repository.MemberRepository;
-import com.home.whattoeat.repository.RestaurantRepository;
+import com.home.whattoeat.repository.restaurant.RestaurantRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class RestaurantService {
 
+	private final CategoryRepository categoryRepository;
 	private final RestaurantRepository restaurantRepository;
 	private final MemberRepository memberRepository;
 
@@ -32,16 +42,31 @@ public class RestaurantService {
 		// 시큐리티에 유저정보일텐데 굳이 검사해야함? -> member 저장해야하니까
 		Member findMember = memberRepository.findByUsername(username)
 				.orElseThrow(NoSuchMemberException::new);
+		// 식당이름 중복 확인
 
-		Restaurant restaurant = Restaurant.builder()
-				.name(request.getName())
-				.phoneNumber(request.getPhoneNumber())
-				.cuisineType(request.getCuisineType())
-				.member(findMember)
-				.build();
+		// 카테고리 이름 리스트 받아오기
+		List<String> categoryNames = request.getCategoryName();
 
-		Restaurant savedRst = restaurantRepository.save(restaurant);
-		return RstSaveResponse.from(savedRst);
+		// 레스토랑 카테고리 생성
+		List<RestaurantCategory> restaurantCategoryList = categoryNames.stream()
+				.map(categoryName -> {
+					// 카테고리 조회
+					Category findCategory = categoryRepository.findByName(categoryName)
+							.orElseThrow(NoSuchCategoryException::new);
+					// 레스토랑 카테고리 생성
+					return RestaurantCategory.createCategory(findCategory);
+				})
+				// 리스트 변환
+				.collect(Collectors.toList());
+
+		// 레스토랑 카테고리 생성
+//		RestaurantCategory restaurantCategory = RestaurantCategory.createCategory(categoryList);
+
+		// 식당 생성
+		Restaurant restaurant = Restaurant.createRestaurant(request, findMember, restaurantCategoryList);
+
+		Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+		return RstSaveResponse.from(savedRestaurant);
 	}
 
 	// 단건 조회
@@ -52,6 +77,24 @@ public class RestaurantService {
 
 
 		return RstFindOneResponse.from(restaurant);
+	}
+
+	// 검색받은 카테고리인 식당 전체 조회
+	public Page<RestaurantCategoryDto> findAllByCategory(Pageable pageable, RstCategoryCondition request) {
+
+		System.out.println("====");
+		System.out.println(request.getCategoryName());
+
+		return restaurantRepository.searchRstByCategory(request, pageable);
+	}
+
+	// 검색받은 카테고리인 식당에서 조건 검색조회
+	public Page<RestaurantCategoryDto> findAllByCondition(Pageable pageable, RstSearchCondition request) {
+
+		System.out.println("====");
+		System.out.println(request.getStarRating());
+
+		return restaurantRepository.searchRstByCondition(request, pageable);
 	}
 
 	// 내가 등록한 식당 전체 조회
@@ -70,7 +113,17 @@ public class RestaurantService {
 				.orElseThrow(NoSuchRestaurantException::new);
 		if (!username.equals(restaurant.getMember().getUsername())) throw new AccessDeniedException();
 
-		restaurant.update(request);
+		// 카테고리 수정
+		List<String> categoryNames = request.getCategoryName();
+		List<RestaurantCategory> restaurantCategoryList = categoryNames.stream()
+				.map(categoryName -> {
+					Category findCategory = categoryRepository.findByName(categoryName)
+							.orElseThrow(NoSuchCategoryException::new);
+					return RestaurantCategory.createCategory(findCategory);
+				})
+				.collect(Collectors.toList());
+
+		restaurant.update(request, restaurantCategoryList);
 	}
 
 	// 삭제
