@@ -1,8 +1,9 @@
 package com.home.whattoeat.dto.member;
 
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 public class LoginRequest {
 
 	private String username;

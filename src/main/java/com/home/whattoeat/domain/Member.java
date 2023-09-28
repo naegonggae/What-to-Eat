@@ -1,6 +1,7 @@
 package com.home.whattoeat.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.home.whattoeat.dto.member.MemberSaveRequest;
 import com.home.whattoeat.dto.member.MemberUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -14,14 +15,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.hibernate.annotations.Where;
 
 @Entity @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-//@ToString //주문이나 주문상세까지 파고드니까
+//@ToString //주문이나 주문상세까지 파고드니까 toString 하고 싶으면 조인한건 빼고 가야지
 public class Member extends BaseEntity {
 
 	@Id
@@ -45,16 +44,17 @@ public class Member extends BaseEntity {
 	@OneToMany(mappedBy = "member")
 	private List<Restaurant> restaurantList = new ArrayList<>();
 
-	public Member(String username, String email, String password) {
-		this.username = username;
-		this.email = email;
-		this.password = password;
+	public Member(MemberSaveRequest request) {
+		this.username = request.getUsername();
+		this.email = request.getEmail();
+		this.password = request.getPassword();
 	}
 
 	public void update(MemberUpdateRequest request) {
 		this.username = request.getUsername();
 		this.email = request.getEmail();
 	}
+
 
 	@Override
 	public String toString() {

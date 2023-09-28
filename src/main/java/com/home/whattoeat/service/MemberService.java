@@ -1,21 +1,30 @@
 package com.home.whattoeat.service;
 
+import com.home.whattoeat.config.auth.PrincipalDetails;
+import com.home.whattoeat.config.jwt.JwtTokenUtil;
+import com.home.whattoeat.dto.member.LoginRequest;
+import com.home.whattoeat.dto.member.LoginResponse;
 import com.home.whattoeat.dto.member.MemberFindAllResponse;
 import com.home.whattoeat.dto.member.MemberFindOneResponse;
 import com.home.whattoeat.dto.member.MemberSaveRequest;
 import com.home.whattoeat.dto.member.MemberSaveResponse;
 import com.home.whattoeat.dto.member.MemberUpdateRequest;
 import com.home.whattoeat.domain.Member;
+import com.home.whattoeat.dto.member.TokenResponse;
 import com.home.whattoeat.exception.member.DuplicateEmailException;
 import com.home.whattoeat.exception.member.DuplicateUsernameException;
 import com.home.whattoeat.exception.member.NoSuchMemberException;
 import com.home.whattoeat.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +38,16 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+	private final AuthenticationManagerBuilder authenticationManagerBuilder;
+	private final JwtTokenUtil jwtTokenUtil;
 	@Autowired
 	EntityManager em;
 
 	// 회원가입
 	@Transactional
 	public MemberSaveResponse saveMember(MemberSaveRequest request) {
+		String username = request.getUsername();
+		System.out.println("username = " + username);;
 
 		// 이미 가입된 회원인지 확인
 		boolean findEmail = memberRepository.existsByEmail(request.getEmail());
@@ -54,6 +67,35 @@ public class MemberService {
 
 		Member saveMember = memberRepository.save(member);
 		return MemberSaveResponse.form(saveMember);
+	}
+
+	public TokenResponse login(LoginRequest loginRequest) {
+
+		// 이거 없어도 되지않을까?
+//		Member findMember = memberRepository.findByUsername(loginRequest.getUsername())
+//				.orElseThrow(NoSuchMemberException::new);
+
+		UsernamePasswordAuthenticationToken authenticationToken =
+				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+
+		System.out.println("authenticationManagerBuilder 로 실제 인증을 시작합니다.");
+		//3. 실제 인증
+		//DaoAuthenticationProvider class 내 additionalAuthenticationChecks() 메소드로 비밀번호 체크
+		Authentication authentication = authenticationManagerBuilder.getObject()
+				.authenticate(authenticationToken);
+		log.info("authentication.getName:" + authentication.getName());
+		log.info("authentication getAuthorities" + authentication.getAuthorities());
+		System.out.println(authentication.getPrincipal());
+		System.out.println(authentication.getCredentials());
+		System.out.println(authentication.getDetails());
+
+		PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+
+		//4.인증 정보 기반으로 JWT 토큰 생성 >> refresh, access token 둘 다 생성
+		TokenResponse tokenResponse = jwtTokenUtil.createToken(principalDetails);
+
+		return tokenResponse;
+
 	}
 
 	// 전체 조회
