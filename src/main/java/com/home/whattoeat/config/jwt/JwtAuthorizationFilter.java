@@ -41,9 +41,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		String requestURI = request.getRequestURI();
 		System.out.println("주소는 : " + requestURI);
 
+		// 회원가입, 로그인 api 는 뚫어줘야함
+		if (requestURI.equals("/api/v1/auth/join") || requestURI.equals("/api/v1/auth/login")) {
+			chain.doFilter(request, response);
+			return;
+		}
+
 		//header 가 있는지 확인
 		if (jwtHeader == null || !jwtHeader.startsWith(jwtTokenUtil.TOKEN_PREFIX)) {
 			System.out.println("JwtAuthorizationFilter : 헤더가 없거나 형식이 잘못됨");
+//			System.out.println(requestURI);
 
 //			throw new JwtException("JWT 형식이 올바르지 않습니다.");
 			chain.doFilter(request, response);

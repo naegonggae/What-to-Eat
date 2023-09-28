@@ -46,8 +46,7 @@ public class SecurityConfig {
 					// 위의 두개의 서블릿이 동일한 URL 패턴에 매핑되어 있어 Spring MVC 서블릿을 사용하도록 설정
 							.requestMatchers(new MvcRequestMatcher(introspector, "/**")).permitAll()
 							.requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/auth/**")).permitAll()
-							.requestMatchers(new MvcRequestMatcher(introspector, "/view/**")).permitAll()
-							// api 만 인증이 필요한 요청으로 설정
+							// api 만 인증이 필요한 요청으로 사용
 							.requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/**")).authenticated())
 					.exceptionHandling((exceptionHandling) ->
 							exceptionHandling.authenticationEntryPoint(jwtAuthenticationEntryPoint))
