@@ -38,11 +38,11 @@ public class Order extends BaseEntity {
 //	private Restaurant restaurant;
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderMenu> orderMenuList = new ArrayList<>();
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "order_id")
-	private Delivery delivery;
+
 	private String orderTime;
 	private String totalAmount;
+
+	// 배달할 주소 적어야함
 	@Enumerated(EnumType.STRING)
 	private OrderStatus orderStatus; // ORDER, CANCEL
 
@@ -65,20 +65,15 @@ public class Order extends BaseEntity {
 		orderMenu.addOrder(this); // orderMenu 에 있는 order this = 요 클래스로 채워줘
 	}
 
-	public void addDelivery(Delivery delivery) {
-		this.delivery = delivery;
-		delivery.addOrder(this);
-	}
 
 	// 주문 생성
-	public static Order createOrder(Member member, Delivery delivery, OrderMenu... orderMenus) { // ... 으로 list 넘김
+	public static Order createOrder(Member member, OrderMenu... orderMenus) { // ... 으로 list 넘김
 		Order order = new Order();
-		order.makeOrder(member, delivery, orderMenus);
+		order.makeOrder(member, orderMenus);
 		return order;
 	}
-	public void makeOrder(Member member, Delivery delivery, OrderMenu... orderMenus) {
+	public void makeOrder(Member member, OrderMenu... orderMenus) {
 		this.member = member;
-		this.delivery = delivery;
 		for (OrderMenu orderMenu : orderMenus) {
 			this.addOrderDetail(orderMenu);
 		}
@@ -90,9 +85,6 @@ public class Order extends BaseEntity {
 	public void orderCancel() {
 		System.out.println("주문취소 로직에 도착했습니다.");
 
-		if (delivery.getDeliveryStatus() == DeliveryStatus.COMP) {
-			throw new IllegalStateException("이미 배송완료된 상품은 취소가 불가능합니다.");
-		}
 		this.orderStatus = OrderStatus.CANCEL;
 		for (OrderMenu orderMenu : orderMenuList) {
 			orderMenu.cancel();

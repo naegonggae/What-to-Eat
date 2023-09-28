@@ -1,6 +1,5 @@
 package com.home.whattoeat.service;
 
-import com.home.whattoeat.domain.Delivery;
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.Menu;
 import com.home.whattoeat.domain.Order;
@@ -16,7 +15,7 @@ import com.home.whattoeat.exception.reataurant.NoSuchRestaurantException;
 import com.home.whattoeat.repository.MemberRepository;
 import com.home.whattoeat.repository.MenuRepository;
 import com.home.whattoeat.repository.OrderRepository;
-import com.home.whattoeat.repository.RestaurantRepository;
+import com.home.whattoeat.repository.restaurant.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,9 +47,7 @@ public class OrderService {
 //		if (!findRestaurant.getMember().equals(findMenu.getRestaurant())) throw new AccessDeniedException();
 
 		OrderMenu orderMenu = OrderMenu.createMenu(findMenu, request.getQuantity(), findMenu.getPrice());
-		Delivery delivery = new Delivery();
-		delivery.changeStatus();
-		Order order = Order.createOrder(member, delivery, orderMenu);
+		Order order = Order.createOrder(member, orderMenu);
 		Order savedOrder = orderRepository.save(order);
 
 //		return OrderSaveResponse.from(savedOrder);
