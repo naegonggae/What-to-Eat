@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -47,6 +48,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint{
 		else if (exception.getClass().equals(TokenExpiredException.class)) {
 			errorName = "TokenExpiredException";
 			errorMessage = "토큰 기간이 만료되었습니다. 다시 로그인해주세요!";
+		}
+		else if (exception.getClass().equals(BadCredentialsException.class)) {
+			errorName = "BadCredentialsException";
+			errorMessage = "비밀번호가 틀렸습니다.";
 		}
 
 		// JSON 형식의 오류 응답을 생성합니다.

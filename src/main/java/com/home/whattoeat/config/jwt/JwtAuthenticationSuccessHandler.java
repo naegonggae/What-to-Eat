@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+// 사용 안함
 public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
 	// 여기도 리다이렉션 필요한가 쿠키생성도필요한가?

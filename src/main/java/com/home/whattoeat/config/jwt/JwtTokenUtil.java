@@ -33,7 +33,7 @@ public class JwtTokenUtil {
 				.withSubject(principalDetails.getUsername())
 				.withIssuedAt(new Date(System.currentTimeMillis()))
 				.withExpiresAt(new Date(System.currentTimeMillis()+EXPIRATION_TIME)) // 만료시간
-				.withClaim("username", principalDetails.getMember().getUsername())
+				.withClaim("username", principalDetails.getUsername())
 				.withClaim("role", principalDetails.getMember().getRole())
 				.sign(Algorithm.HMAC512(SECRET)); // SECRET = 사이트만 알고있는 고유값
 

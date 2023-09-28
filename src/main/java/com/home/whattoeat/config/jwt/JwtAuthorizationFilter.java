@@ -4,7 +4,6 @@ import com.home.whattoeat.config.auth.PrincipalDetails;
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.exception.member.NoSuchMemberException;
 import com.home.whattoeat.repository.MemberRepository;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,19 +39,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 		// join, login 주소로 들어오는 요청인 경우 다음 필터 또는 요청 핸들러로 요청을 전달하지 않고 바로 리턴
 		String requestURI = request.getRequestURI();
-		if (requestURI.equals("/api/v1/auth/join") || requestURI.equals("/api/v1/auth/login")) {
-			System.out.println("requestURI 가 회원가입 또는 로그인 주소 입니다." + requestURI);
-			chain.doFilter(request, response);
-			return;
-		}
+		System.out.println("주소는 : " + requestURI);
 
 		//header 가 있는지 확인
 		if (jwtHeader == null || !jwtHeader.startsWith(jwtTokenUtil.TOKEN_PREFIX)) {
-			System.out.println("JwtAuthorizationFilter : 헤더가 없거나 형식이 잘못되어 중단");
+			System.out.println("JwtAuthorizationFilter : 헤더가 없거나 형식이 잘못됨");
 
-			throw new JwtException("JWT 형식이 올바르지 않습니다.");
-//			chain.doFilter(request, response);
-//			return;
+//			throw new JwtException("JWT 형식이 올바르지 않습니다.");
+			chain.doFilter(request, response);
+			return;
 		}
 
 		//JWT 토큰을 검증해서 정상적인 사용자인지 확인

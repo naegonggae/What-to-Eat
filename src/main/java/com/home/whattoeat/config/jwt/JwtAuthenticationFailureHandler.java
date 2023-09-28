@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.stereotype.Component;
 
 @Component
+// 사용 안함
 public class JwtAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
 	// 리다이렉트가 필요한가?

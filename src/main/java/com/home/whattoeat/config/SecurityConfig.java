@@ -19,8 +19,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @EnableWebSecurity // 시큐리티 활성화 -> 기본 스프링 필터체인에 등록
@@ -35,14 +36,19 @@ public class SecurityConfig {
 	private final JwtTokenUtil jwtTokenUtil;
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
 		System.out.println("필터 시작");
 
 			http
-
 					.authorizeHttpRequests(authorize -> authorize
-							.requestMatchers("/api/v1/auth/**").permitAll()
-							.anyRequest().authenticated())
+					// org.h2.server.web.JakartaWebServlet: H2 데이터베이스의 웹 콘솔용 서블릿
+					// org.springframework.web.servlet.DispatcherServlet: Spring MVC 웹 애플리케이션의 디스패처 서블릿
+					// 위의 두개의 서블릿이 동일한 URL 패턴에 매핑되어 있어 Spring MVC 서블릿을 사용하도록 설정
+							.requestMatchers(new MvcRequestMatcher(introspector, "/**")).permitAll()
+							.requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/auth/**")).permitAll()
+							.requestMatchers(new MvcRequestMatcher(introspector, "/view/**")).permitAll()
+							// api 만 인증이 필요한 요청으로 설정
+							.requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/**")).authenticated())
 					.exceptionHandling((exceptionHandling) ->
 							exceptionHandling.authenticationEntryPoint(jwtAuthenticationEntryPoint))
 					.csrf((csrf) -> csrf.disable())
@@ -67,7 +73,7 @@ public class SecurityConfig {
 
 			JwtAuthorizationFilter atr = new JwtAuthorizationFilter(authenticationManager, memberRepository, jwtTokenUtil);
 			http
-					.addFilterBefore(att, UsernamePasswordAuthenticationFilter.class)
+					//.addFilterBefore(att, UsernamePasswordAuthenticationFilter.class)
 					.addFilterBefore(atr, BasicAuthenticationFilter.class);
 		}
 	}
