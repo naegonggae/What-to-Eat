@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class OrderMenu extends BaseEntity {
 
 	@Id @GeneratedValue
-	@Column(name = "orderMenu_id")
+	@Column(name = "order_menu_id")
 	private Long id;
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -48,6 +48,12 @@ public class OrderMenu extends BaseEntity {
 				.quantity(quantity)
 				.price(price)
 				.build();
+	}
+
+	public OrderMenu(Menu menu, int quantity, int price) {
+		this.menu = menu;
+		this.quantity = quantity;
+		this.price = price;
 	}
 
 	public void cancel() {

@@ -39,8 +39,12 @@ public class Order extends BaseEntity {
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderMenu> orderMenuList = new ArrayList<>();
 
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "cart_id")
+	private Cart cart;
+
 	private String orderTime;
-	private String totalAmount;
+	private int totalAmount;
 
 	// 배달할 주소 적어야함
 	@Enumerated(EnumType.STRING)
@@ -67,16 +71,38 @@ public class Order extends BaseEntity {
 
 
 	// 주문 생성
-	public static Order createOrder(Member member, OrderMenu... orderMenus) { // ... 으로 list 넘김
-		Order order = new Order();
-		order.makeOrder(member, orderMenus);
-		return order;
+	public static Order createOrder(Member member, Cart cart) { // ... 으로 list 넘김
+
+//		order.makeOrder(member, cart);
+		List<OrderMenu> copiedOrderMenu = copyCartMenuToOrderMenu(cart);
+
+
+		return new Order(member, copiedOrderMenu);
 	}
-	public void makeOrder(Member member, OrderMenu... orderMenus) {
-		this.member = member;
-		for (OrderMenu orderMenu : orderMenus) {
-			this.addOrderDetail(orderMenu);
+
+	private static List<OrderMenu> copyCartMenuToOrderMenu(Cart cart) {
+		List<OrderMenu> copiedOrderMenu = new ArrayList<>();
+		for (CartMenu cartMenu : cart.getCartMenus()) {
+			OrderMenu orderMenu =
+					new OrderMenu(cartMenu.getMenu(), cartMenu.getQuantity(), cartMenu.getPrice());
+			copiedOrderMenu.add(orderMenu);
 		}
+		return copiedOrderMenu;
+	}
+
+//	public void makeOrder(Member member, Cart cart) {
+//		this.member = member;
+//		for (CartMenu cartMenu : cart.getCartMenus()) {
+//			this.orderMenuList.add(cartMenu);
+//		}
+//		this.orderStatus = OrderStatus.ORDER;
+//		this.orderDate = LocalDateTime.now();
+//	}
+
+	public Order(Member member, List<OrderMenu> orderMenuList) {
+		this.member = member;
+		this.orderMenuList = orderMenuList;
+		this.totalAmount = getTotalPrice();
 		this.orderStatus = OrderStatus.ORDER;
 		this.orderDate = LocalDateTime.now();
 	}

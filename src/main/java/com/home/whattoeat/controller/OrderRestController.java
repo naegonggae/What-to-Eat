@@ -28,9 +28,8 @@ public class OrderRestController {
 	private final OrderService orderService;
 
 	@PostMapping
-	public ResponseEntity<Response<OrderSaveResponse>> order(@RequestBody OrderSaveRequest request,
-			@AuthenticationPrincipal PrincipalDetails details) {
-		OrderSaveResponse result = orderService.order(request, details.getMember());
+	public ResponseEntity<Response<OrderSaveResponse>> order(@AuthenticationPrincipal PrincipalDetails details) {
+		OrderSaveResponse result = orderService.order(details.getMember());
 		return ResponseEntity.created(URI.create("/api/v1/orders"+result.getId()))
 				.body(Response.success(result));
 	}

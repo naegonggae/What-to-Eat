@@ -1,5 +1,6 @@
 package com.home.whattoeat.service;
 
+import com.home.whattoeat.domain.Cart;
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.Menu;
 import com.home.whattoeat.domain.Order;
@@ -8,10 +9,12 @@ import com.home.whattoeat.domain.Restaurant;
 import com.home.whattoeat.dto.order.OrderFindResponse;
 import com.home.whattoeat.dto.order.OrderSaveRequest;
 import com.home.whattoeat.dto.order.OrderSaveResponse;
+import com.home.whattoeat.exception.cart.NoSuchCartException;
 import com.home.whattoeat.exception.member.AccessDeniedException;
 import com.home.whattoeat.exception.menu.NoSuchMenuException;
 import com.home.whattoeat.exception.order.NoSuchOrderException;
 import com.home.whattoeat.exception.reataurant.NoSuchRestaurantException;
+import com.home.whattoeat.repository.CartRepository;
 import com.home.whattoeat.repository.MemberRepository;
 import com.home.whattoeat.repository.MenuRepository;
 import com.home.whattoeat.repository.OrderRepository;
@@ -27,27 +30,40 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class OrderService {
 
+	private final CartService cartService;
 	private final OrderRepository orderRepository;
 	private final MenuRepository menuRepository;
 	private final RestaurantRepository restaurantRepository;
 	private final MemberRepository memberRepository;
+	private final CartRepository cartRepository;
 
-	// 주문 - 결제 - 배송
+	// 장바구니는 만들어져 있고 주문 버튼 누르기
 	@Transactional
-	public OrderSaveResponse order(OrderSaveRequest request, Member member) {
+	public OrderSaveResponse order(Member member) {
 
 		// 내가 만든것들이 아니여도 상관없음
-		Restaurant findRestaurant = restaurantRepository.findByName(request.getRestaurantName())
-				.orElseThrow(NoSuchRestaurantException::new);
+//		Restaurant findRestaurant = restaurantRepository.findByName(request.getRestaurantName())
+//				.orElseThrow(NoSuchRestaurantException::new);
 
 //		if (!member.equals(findRestaurant.getMember())) throw new AccessDeniedException();
-		Menu findMenu = menuRepository.findByName(request.getMenuName())
-				.orElseThrow(NoSuchMenuException::new);
+//		Menu findMenu = menuRepository.findByName(request.getMenuName())
+//				.orElseThrow(NoSuchMenuException::new);
 
 //		if (!findRestaurant.getMember().equals(findMenu.getRestaurant())) throw new AccessDeniedException();
 
-		OrderMenu orderMenu = OrderMenu.createMenu(findMenu, request.getQuantity(), findMenu.getPrice());
-		Order order = Order.createOrder(member, orderMenu);
+//		OrderMenu orderMenu = OrderMenu.createMenu(findMenu, request.getQuantity(), findMenu.getPrice());
+
+		Cart findCart = cartRepository.findByMember(member)
+				.orElseThrow(NoSuchCartException::new);
+
+		Order order = Order.createOrder(member, findCart);
+
+		// 장바구니 비우기
+		cartRepository.deleteById(findCart.getId());
+		/**
+		 * cart 정보를 가져와서 orderItem 에 복사한다. 총액도 받아온다.
+		 * cart 는 삭제한다. 그러면 cart 랑 cartMenu 를 독립적으로 사용가능하다.
+		 */
 		Order savedOrder = orderRepository.save(order);
 
 //		return OrderSaveResponse.from(savedOrder);

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class CategoryExceptionHandler {
 
 	@ExceptionHandler(NoSuchCategoryException.class)
-	public ResponseEntity<?> ncSuchCategoryException(NoSuchCategoryException e) {
+	public ResponseEntity<?> noSuchCategoryException(NoSuchCategoryException e) {
 		return ResponseEntity.status(e.getStatus())
 				.body(Response.error(new ErrorResponse(e.getStatus(), e.getStatus().value(), e.getMessage())));
 	}
