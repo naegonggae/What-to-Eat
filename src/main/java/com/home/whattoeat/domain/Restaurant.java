@@ -2,6 +2,8 @@ package com.home.whattoeat.domain;
 
 import com.home.whattoeat.dto.restuarant.RstSaveRequest;
 import com.home.whattoeat.dto.restuarant.RstUpdateRequest;
+import com.home.whattoeat.dto.review.ReviewSaveRequest;
+import com.home.whattoeat.dto.review.ReviewUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,6 +38,7 @@ public class Restaurant extends BaseEntity {
 	private Long numberOfOrders; // 리뷰할때 구현 지금은 하드 코딩해버리자
 	private int minOrderAmount;
 	private int maxOrderAmount;
+	private int reviewCount;
 
 	// 영업시간
 	// 가게 소개
@@ -102,4 +105,80 @@ public class Restaurant extends BaseEntity {
 	}
 
 
+	public void updateInfo(ReviewSaveRequest request) {
+		this.starRating = getAvgRating(request.getStarRating());
+		this.reviewCount++;
+		this.numberOfOrders++;
+	}
+
+	public double getAvgRating(Double newRating) {
+		System.out.println("getAvgRating===========");
+		System.out.println("starRating = " + starRating);
+		System.out.println("reviewCount = " + reviewCount);
+		System.out.println("newRating = " + newRating);
+		if (reviewCount == 0) {
+			return newRating;
+		} else {
+			double ratingSum = starRating * reviewCount;
+			System.out.println("ratingSum = " + ratingSum);
+			ratingSum += newRating;
+			System.out.println("ratingSum = " + ratingSum);
+			double newAvgRating = ratingSum / (reviewCount + 1);
+			System.out.println("newAvgRating = " + newAvgRating);
+			double roundedRating = Math.round(newAvgRating * 10.0) / 10.0;
+
+			return roundedRating;
+		}
+	}
+
+	public void updateNewRatingInfo(ReviewUpdateRequest request, Double oldRating) {
+		this.starRating = getUpdateAvgRating(request.getStarRating(), oldRating);
+	}
+	public double getUpdateAvgRating(Double newRating, Double oldRating) {
+		System.out.println("getUpdateAvgRating===========");
+		System.out.println("starRating = " + starRating);
+		System.out.println("reviewCount = " + reviewCount);
+		System.out.println("newRating = " + newRating);
+		if (reviewCount - 1 == 0) {
+			return newRating;
+		} else {
+			double ratingSum = starRating * reviewCount;
+			System.out.println("ratingSum = " + ratingSum);
+
+			ratingSum = ratingSum + newRating - oldRating;
+			System.out.println("ratingSum = " + ratingSum);
+
+			double newAvgRating = ratingSum / (reviewCount);
+			System.out.println("newAvgRating = " + newAvgRating);
+			double roundedRating = Math.round(newAvgRating * 10.0) / 10.0;
+
+			return roundedRating;
+		}
+	}
+
+	public void excludeRatings(Double rating) {
+		this.starRating = deleteRating(rating);
+		this.reviewCount--;
+	}
+	public Double deleteRating(Double rating) {
+		System.out.println("deleteRating===========");
+		System.out.println("starRating = " + starRating);
+		System.out.println("reviewCount = " + reviewCount);
+		System.out.println("rating = " + rating);
+		if (reviewCount - 1 == 0) {
+			return 0.0;
+		} else {
+			double ratingSum = starRating * reviewCount;
+			System.out.println("ratingSum = " + ratingSum);
+
+			ratingSum -= rating;
+			System.out.println("ratingSum = " + ratingSum);
+
+			double newAvgRating = ratingSum / (reviewCount - 1);
+			System.out.println("newAvgRating = " + newAvgRating);
+			double roundedRating = Math.round(newAvgRating * 10.0) / 10.0;
+
+			return roundedRating;
+		}
+	}
 }

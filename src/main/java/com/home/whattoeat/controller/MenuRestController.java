@@ -58,7 +58,7 @@ public class MenuRestController {
 	}
 
 	@DeleteMapping("/{rstId}/menus/{menuId}")
-	public ResponseEntity<Response<Void>> update(@PathVariable Long rstId,
+	public ResponseEntity<Response<Void>> delete(@PathVariable Long rstId,
 			@PathVariable Long menuId, Authentication authentication) {
 		menuService.delete(rstId, menuId, authentication.getName());
 		return ResponseEntity.noContent().build();
