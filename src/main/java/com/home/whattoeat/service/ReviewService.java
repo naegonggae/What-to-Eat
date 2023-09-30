@@ -3,7 +3,6 @@ package com.home.whattoeat.service;
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.Restaurant;
 import com.home.whattoeat.domain.Review;
-import com.home.whattoeat.dto.restuarant.RstFindAllResponse;
 import com.home.whattoeat.dto.review.ReviewFindResponse;
 import com.home.whattoeat.dto.review.ReviewSaveRequest;
 import com.home.whattoeat.dto.review.ReviewSaveResponse;
