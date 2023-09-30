@@ -31,7 +31,14 @@ public class CommentService {
 		Review findReview = reviewRepository.findById(reviewId)
 				.orElseThrow(NoSuchReviewException::new);
 
+		// 일반손님용
 		Comment comment = Comment.createComment(request, findReview, member);
+
+		// 댓글 다는 사람이 사장님이면 가게사장님입니다. 표시
+		if (member.getUsername().equals(findReview.getRestaurant().getMember().getUsername())) {
+			comment = Comment.createOwnerComment(request, findReview, member);
+		}
+
 
 		Comment savedComment = commentRepository.save(comment);
 		return CommentSaveResponse.from(savedComment.getId());

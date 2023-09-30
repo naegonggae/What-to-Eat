@@ -44,6 +44,10 @@ public class Comment extends BaseEntity {
 			Member member) {
 		return new Comment(request.getContent(), member, findReview);
 	}
+	public static Comment createOwnerComment(CommentSaveRequest request, Review findReview,
+			Member member) {
+		return new Comment("가게 사장님이 작성한 댓글입니다.\n"+request.getContent(), member, findReview);
+	}
 	public Comment(String content, Member member, Review review) {
 		this.content = content;
 		this.member = member;

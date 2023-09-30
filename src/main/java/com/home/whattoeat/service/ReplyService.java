@@ -31,7 +31,13 @@ public class ReplyService {
 		Comment findComment = commentRepository.findById(cmtId)
 				.orElseThrow(NoSuchCommentException::new);
 
+		// 일반 회원용
 		Reply reply = Reply.createReply(request, findComment, member);
+
+		// 댓글 다는 사람이 사장님이면 가게사장님입니다. 표시
+		if (member.getUsername().equals(findComment.getReview().getRestaurant().getMember().getUsername())) {
+			reply = Reply.createOwnerReply(request, findComment, member);
+		}
 
 		Reply savedReply = replyRepository.save(reply);
 		return ReplySaveResponse.from(savedReply);
