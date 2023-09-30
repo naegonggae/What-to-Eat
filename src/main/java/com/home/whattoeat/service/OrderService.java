@@ -21,7 +21,9 @@ import com.home.whattoeat.repository.OrderRepository;
 import com.home.whattoeat.repository.restaurant.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,8 +87,12 @@ public class OrderService {
 		findOrder.softDelete();
 	}
 
-	// 내가 한 주문 조회
-	public Page<OrderFindResponse> findAllMyOrder(Pageable pageable, Member member) {
+	// 내가 한 주문 조회 - 최신순서로 정렬해야함
+	public Page<OrderFindResponse> findAllMyOrder(Member member) {
+		// 생성 시간을 기준으로 내림차순으로 정렬하도록 Pageable 객체 생성
+		// 0번페이지부터 시작해서 한페이지에 20개씩 들어감
+		Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+
 		return orderRepository.findAllByMember(member, pageable).map(OrderFindResponse::from);
 	}
 

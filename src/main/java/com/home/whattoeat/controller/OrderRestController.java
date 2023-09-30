@@ -42,10 +42,9 @@ public class OrderRestController {
 	}
 
 	@GetMapping
-	public ResponseEntity<Response<Page<OrderFindResponse>>> findAllMyOrder(Pageable pageable,
+	public ResponseEntity<Response<Page<OrderFindResponse>>> findAllMyOrder(
 			@AuthenticationPrincipal PrincipalDetails details) {
-		Page<OrderFindResponse> result = orderService.findAllMyOrder(pageable,
-				details.getMember());
+		Page<OrderFindResponse> result = orderService.findAllMyOrder(details.getMember());
 		return ResponseEntity.ok().body(Response.success(result));
 	}
 
