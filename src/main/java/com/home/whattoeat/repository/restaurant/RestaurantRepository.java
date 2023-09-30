@@ -11,5 +11,4 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
 
 	Optional<Restaurant> findByName(String name);
 	Page<Restaurant> findAllByMember(Member member, Pageable pageable);
-
 }

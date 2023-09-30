@@ -8,7 +8,9 @@ import static org.springframework.util.StringUtils.hasText;
 import com.home.whattoeat.dto.restuarant.QRestaurantCategoryDto;
 import com.home.whattoeat.dto.restuarant.RstCategoryCondition;
 import com.home.whattoeat.dto.restuarant.RestaurantCategoryDto;
+import com.home.whattoeat.dto.restuarant.RstFindAllResponse;
 import com.home.whattoeat.dto.restuarant.RstSearchCondition;
+import com.home.whattoeat.dto.restuarant.RstSearchKeyword;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -107,6 +109,46 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
 
+	@Override
+	public Page<RestaurantCategoryDto> searchRstByKeyword(RstSearchKeyword condition,
+			Pageable pageable) {
+		List<RestaurantCategoryDto> content = queryFactory
+				.selectDistinct(new QRestaurantCategoryDto(
+						restaurant.name,
+						restaurant.phoneNumber,
+						restaurant.starRating,
+						restaurant.numberOfOrders,
+						restaurant.minOrderAmount,
+						restaurant.maxOrderAmount
+				))
+				.from(restaurant)
+				.join(restaurant.restaurantCategories, restaurantCategory)
+				.join(restaurantCategory.category, category)
+				.where(
+						categoryNameEq(condition.getKeyword())
+						.or(rstNameContainsEq(condition))
+				)
+				.offset(pageable.getOffset()) // 몇개를 넘기고 가져올건가
+				.limit(pageable.getPageSize()) // 몇개씩 가져올건가
+				.fetch();
+
+		JPAQuery<Long> countQuery = queryFactory
+				.select(restaurant.count())
+				.from(restaurant)
+				.join(restaurant.restaurantCategories, restaurantCategory)
+				.join(restaurantCategory.category, category)
+				.where(
+						categoryNameEq(condition.getKeyword())
+						.or(rstNameContainsEq(condition))
+				);
+
+		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+	}
+
+	// 식당이름에 키워드가 포함되어 있는 식당들
+	private BooleanExpression rstNameContainsEq(RstSearchKeyword condition) {
+		return restaurant.name.contains(condition.getKeyword());
+	}
 
 	// 카테고리 이름에 속한 식당들
 	private BooleanExpression categoryNameEq(String categoryName) {

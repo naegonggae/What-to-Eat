@@ -11,6 +11,7 @@ import com.home.whattoeat.dto.restuarant.RstFindOneResponse;
 import com.home.whattoeat.dto.restuarant.RstSaveRequest;
 import com.home.whattoeat.dto.restuarant.RstSaveResponse;
 import com.home.whattoeat.dto.restuarant.RstSearchCondition;
+import com.home.whattoeat.dto.restuarant.RstSearchKeyword;
 import com.home.whattoeat.dto.restuarant.RstUpdateRequest;
 import com.home.whattoeat.exception.category.NoSuchCategoryException;
 import com.home.whattoeat.exception.member.AccessDeniedException;
@@ -79,6 +80,7 @@ public class RestaurantService {
 		return RstFindOneResponse.from(restaurant);
 	}
 
+
 	// 검색받은 카테고리인 식당 전체 조회
 	public Page<RestaurantCategoryDto> findAllByCategory(Pageable pageable, RstCategoryCondition request) {
 
@@ -95,6 +97,11 @@ public class RestaurantService {
 		System.out.println(request.getStarRating());
 
 		return restaurantRepository.searchRstByCondition(request, pageable);
+	}
+
+	// 검색한 키워드의 카테고리를 가지고 있거나 식당이름에 키워드가 들어가면 조회
+	public Page<RestaurantCategoryDto> findAllByKeyword(RstSearchKeyword request, Pageable pageable) {
+		return restaurantRepository.searchRstByKeyword(request, pageable);
 	}
 
 	// 내가 등록한 식당 전체 조회

@@ -7,6 +7,7 @@ import com.home.whattoeat.dto.restuarant.RstFindOneResponse;
 import com.home.whattoeat.dto.restuarant.RstSaveRequest;
 import com.home.whattoeat.dto.restuarant.RstSaveResponse;
 import com.home.whattoeat.dto.restuarant.RstSearchCondition;
+import com.home.whattoeat.dto.restuarant.RstSearchKeyword;
 import com.home.whattoeat.dto.restuarant.RstUpdateRequest;
 import com.home.whattoeat.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ public class RestaurantRestController {
 		return ResponseEntity.ok().body(findAllResponses);
 	}
 
+
 	@GetMapping("/categories")
 	public ResponseEntity<Page<RestaurantCategoryDto>> findAllByCategory(Pageable pageable, @RequestBody RstCategoryCondition request) {
 		Page<RestaurantCategoryDto> result = restaurantService.findAllByCategory(pageable, request);
@@ -52,6 +54,13 @@ public class RestaurantRestController {
 	@GetMapping("/condition")
 	public ResponseEntity<Page<RestaurantCategoryDto>> findAllByCondition(Pageable pageable, @RequestBody RstSearchCondition request) {
 		Page<RestaurantCategoryDto> result = restaurantService.findAllByCondition(pageable, request);
+		return ResponseEntity.ok().body(result);
+	}
+
+	@GetMapping("/keyword")
+	public ResponseEntity<Page<RestaurantCategoryDto>> findAllByKeyword(Pageable pageable, @RequestBody
+			RstSearchKeyword request) {
+		Page<RestaurantCategoryDto> result = restaurantService.findAllByKeyword(request, pageable);
 		return ResponseEntity.ok().body(result);
 	}
 
