@@ -1,17 +1,14 @@
 package com.home.whattoeat.controller.ui;
 
-import com.home.whattoeat.dto.member.LoginRequest;
+import com.home.whattoeat.dto.member.MemberLoginRequest;
 import com.home.whattoeat.dto.member.MemberSaveRequest;
 import com.home.whattoeat.dto.member.MemberSaveResponse;
 import com.home.whattoeat.dto.member.TokenResponse;
 import com.home.whattoeat.service.MemberService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -47,12 +44,12 @@ public class MemberController {
 
 	@GetMapping("/auth/login")
 	public String loginForm(Model model) {
-		model.addAttribute("loginRequest", new LoginRequest());
+		model.addAttribute("loginRequest", new MemberLoginRequest());
 		return "members/loginForm";
 	}
 
 	@PostMapping("/auth/login")
-	public String login(LoginRequest form, BindingResult result, HttpServletResponse response) {
+	public String login(MemberLoginRequest form, BindingResult result, HttpServletResponse response) {
 		System.out.println(form.getUsername());
 		System.out.println(form.getPassword());
 		TokenResponse tokenResponse = memberService.login(form);

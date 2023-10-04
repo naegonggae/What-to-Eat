@@ -21,7 +21,7 @@ public class MemberFindResponse {
 				member.getId(),
 				member.getUsername(),
 				member.getEmail(),
-				member.getPassword());
+				member.getPhoneNumber());
 	}
 
 }

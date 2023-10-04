@@ -18,15 +18,11 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @AllArgsConstructor(access = PROTECTED)
 @NoArgsConstructor(access = PROTECTED)
-@Where(clause = "deleted_at is NULL")
-@ToString
 public class Member extends BaseEntity {
 
 	@Id
@@ -67,4 +63,15 @@ public class Member extends BaseEntity {
 		this.phoneNumber = request.getPhoneNumber();
 	}
 
+	@Override
+	public String toString() {
+		return "Member{" +
+				"id=" + id +
+				", username='" + username + '\'' +
+				", email='" + email + '\'' +
+				", password='" + password + '\'' +
+				", phoneNumber='" + phoneNumber + '\'' +
+				", role=" + role +
+				'}';
+	}
 }

@@ -6,13 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class LoginResponse {
+public class MemberLoginRequest {
 
-	private String Message;
-
-	public static LoginResponse from() {
-		return new LoginResponse("로그인 되었습니다.");
-	}
+	private String username;
+	private String password;
 }

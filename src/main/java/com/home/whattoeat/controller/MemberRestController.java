@@ -1,6 +1,7 @@
 package com.home.whattoeat.controller;
 
-import com.home.whattoeat.dto.member.LoginRequest;
+import com.home.whattoeat.dto.member.MemberLoginRequest;
+import com.home.whattoeat.dto.member.MemberLoginResponse;
 import com.home.whattoeat.dto.member.MemberFindResponse;
 import com.home.whattoeat.dto.member.MemberSaveRequest;
 import com.home.whattoeat.dto.member.MemberSaveResponse;
@@ -41,10 +42,10 @@ public class MemberRestController {
 
 	// 로그인
 	@PostMapping("/auth/login")
-	public ResponseEntity<Response<TokenResponse>> login(
-			@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+	public ResponseEntity<Response<MemberLoginResponse>> login(
+			@RequestBody MemberLoginRequest memberLoginRequest, HttpServletResponse response) {
 
-		TokenResponse tokenResponse = memberService.login(loginRequest);
+		TokenResponse tokenResponse = memberService.login(memberLoginRequest);
 
 		// 쿠키 설정
 		Cookie cookie = new Cookie("accessToken", tokenResponse.getAccessToken());
@@ -57,21 +58,21 @@ public class MemberRestController {
 		// access Token 은 body 로 전송
 		response.addHeader("Authorization", "Bearer " + tokenResponse.getAccessToken());
 
-		return ResponseEntity.ok().body(Response.success(TokenResponse.form()));
+		return ResponseEntity.ok().body(Response.success(MemberLoginResponse.from()));
 	}
 
 	// 이용 x - 회원 단건 조회
 	@GetMapping("/members/{id}")
 	public ResponseEntity<Response<MemberFindResponse>> findOne(@PathVariable Long id) {
-		MemberFindResponse findMember = memberService.findOne(id);
-		return ResponseEntity.ok().body(Response.success(findMember));
+		MemberFindResponse result = memberService.findOne(id);
+		return ResponseEntity.ok().body(Response.success(result));
 	}
 
 	// 이용 x - 전체 회원 조회
 	@GetMapping("/members")
 	public ResponseEntity<Response<Page<MemberFindResponse>>> findAll(Pageable pageable) {
-		Page<MemberFindResponse> memberList = memberService.findAll(pageable);
-		return ResponseEntity.ok().body(Response.success(memberList));
+		Page<MemberFindResponse> result = memberService.findAll(pageable);
+		return ResponseEntity.ok().body(Response.success(result));
 	}
 
 	// 회원정보 수정

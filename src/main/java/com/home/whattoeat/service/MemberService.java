@@ -2,11 +2,7 @@ package com.home.whattoeat.service;
 
 import com.home.whattoeat.config.auth.PrincipalDetails;
 import com.home.whattoeat.config.jwt.JwtTokenUtil;
-import com.home.whattoeat.domain.BaseEntity;
-import com.home.whattoeat.domain.Comment;
-import com.home.whattoeat.domain.Reply;
-import com.home.whattoeat.domain.Review;
-import com.home.whattoeat.dto.member.LoginRequest;
+import com.home.whattoeat.dto.member.MemberLoginRequest;
 import com.home.whattoeat.dto.member.MemberFindResponse;
 import com.home.whattoeat.dto.member.MemberSaveRequest;
 import com.home.whattoeat.dto.member.MemberSaveResponse;
@@ -22,9 +18,7 @@ import com.home.whattoeat.repository.MemberRepository;
 import com.home.whattoeat.repository.ReplyRepository;
 import com.home.whattoeat.repository.ReviewRepository;
 import com.home.whattoeat.repository.restaurant.RestaurantRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Slf4j
 public class MemberService {
 
 	private final MemberRepository memberRepository;
@@ -68,10 +61,10 @@ public class MemberService {
 
 
 	// 로그인
-	public TokenResponse login(LoginRequest loginRequest) {
+	public TokenResponse login(MemberLoginRequest memberLoginRequest) {
 
 		UsernamePasswordAuthenticationToken authenticationToken =
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+				new UsernamePasswordAuthenticationToken(memberLoginRequest.getUsername(), memberLoginRequest.getPassword());
 
 		System.out.println("memberService-login authenticationManagerBuilder 로 실제 인증을 시작합니다.");
 		// 실제 인증 - DaoAuthenticationProvider class 내 additionalAuthenticationChecks() 메소드로 비밀번호 체크
@@ -128,17 +121,12 @@ public class MemberService {
 		boolean existsByMember = restaurantRepository.existsByMember(findMember);
 		if (existsByMember) throw new ConstraintViolationMemberException();
 
-		// 리뷰나 댓글 대댓글은 소프트 삭제
-		List<Review> findReviews = reviewRepository.findAllByMember(findMember);
-		findReviews.stream().forEach(BaseEntity::softDelete);
-		List<Comment> findComments = commentRepository.findAllByMember(findMember);
-		findComments.stream().forEach(BaseEntity::softDelete);
-		List<Reply> findReplies = replyRepository.findAllByMember(findMember);
-		findReplies.stream().forEach(BaseEntity::softDelete);
+		// 회원이 작성한 리뷰나 댓글 대댓글은 삭제
+		reviewRepository.deleteAllByMember(findMember);
+		commentRepository.deleteAllByMember(findMember);
+		replyRepository.deleteAllByMember(findMember);
 
-		// 소프트 삭제
-		// 추후 일정기간이후 벌크성 삭제 로직 필요
-		findMember.softDelete();
+		memberRepository.deleteById(id);
 	}
 
 	private void isDuplicatedUsername(String username) {
