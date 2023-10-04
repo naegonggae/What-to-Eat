@@ -1,13 +1,10 @@
 package com.home.whattoeat.repository.restaurant;
 
 import static com.home.whattoeat.domain.QCategory.category;
-import static com.home.whattoeat.domain.QMember.member;
-import static com.home.whattoeat.domain.QOrder.order;
 import static com.home.whattoeat.domain.QRestaurant.restaurant;
 import static com.home.whattoeat.domain.QRestaurantCategory.restaurantCategory;
 import static org.springframework.util.StringUtils.hasText;
 
-import com.home.whattoeat.domain.Order;
 import com.home.whattoeat.domain.Restaurant;
 import com.home.whattoeat.dto.restuarant.RstCategoryCondition;
 import com.home.whattoeat.dto.restuarant.RstSearchCondition;
@@ -27,11 +24,9 @@ import org.springframework.data.support.PageableExecutionUtils;
 public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
-	private final EntityManager em;
 
-	public RestaurantRepositoryImpl(EntityManager entityManager, EntityManager em) {
+	public RestaurantRepositoryImpl(EntityManager entityManager) {
 		this.queryFactory = new JPAQueryFactory(entityManager);
-		this.em = em;
 	}
 
 	@Override
@@ -97,8 +92,6 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
 
-		// 기본 정렬 방식을 아이디(ID) 오름차순으로 설정
-//		OrderSpecifier<?> orderSpecifier = getOrderSpecifier(condition);
 	private static OrderSpecifier<?> getOrderSpecifier(RstSearchCondition condition) {
 		OrderSpecifier<?> orderSpecifier = restaurant.reviewCount.asc();
 
@@ -124,9 +117,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 				.join(restaurant.restaurantCategoryList, restaurantCategory)
 				.join(restaurantCategory.category, category)
 				.where(
-//						rstNameContainsEq(condition.getKeyword())
 						categoryNameEq(condition.getKeyword())
-//						rstNameContainsEq(condition.getKeyword())
 						.or(rstNameContainsEq(condition.getKeyword()))
 				)
 				.offset(pageable.getOffset()) // 몇개를 넘기고 가져올건가
@@ -139,36 +130,11 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 				.join(restaurant.restaurantCategoryList, restaurantCategory)
 				.join(restaurantCategory.category, category)
 				.where(
-//						rstNameContainsEq(condition.getKeyword())
 						categoryNameEq(condition.getKeyword())
-//						rstNameContainsEq(condition.getKeyword())
 						.or(rstNameContainsEq(condition.getKeyword()))
 				);
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-	}
-
-	@Override
-	public List<Order> findAllOrder() {
-		return queryFactory
-				.selectFrom(order)
-				.join(order.member, member).fetchJoin()
-				.fetch();
-	}
-
-	@Override
-	public void bulkDelete(Long id) {
-		long count = queryFactory
-				.delete(restaurant)
-
-//				.set(restaurant.restaurantCategoryList, restaurantCategory.category.name, "")
-//				.where(member.age.lt(28)) // member1, 2 만 비회원으로 바뀌고 나머지는 유지
-				.execute();
-
-		// DB에는 수정된 값이 반영되어있고 영속성컨텍스트에는 변경되기 전의 값이 유지되어있기때문에 데이터가 일관되지 않음 그래서 영속성을 비워줘야한다.
-		em.flush();
-		em.clear();
-
 	}
 
 	// 식당이름에 키워드가 포함되어 있는 식당들
@@ -195,6 +161,5 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 	private BooleanExpression maxOrderAmountGoeEq(Integer maxOAGoe) {
 		return maxOAGoe != null ? restaurant.maxOrderAmount.goe(maxOAGoe) : null;
 	}
-
 
 }
