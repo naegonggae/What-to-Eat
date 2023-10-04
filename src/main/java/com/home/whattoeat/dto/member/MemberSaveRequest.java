@@ -8,9 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberSaveRequest {
 
 	@NotEmpty(message = "회원 이름은 필수 입니다.")
@@ -18,5 +18,7 @@ public class MemberSaveRequest {
 	private String email;
 	@NotEmpty(message = "비밀번호는 필수 입니다.")
 	private String password;
+	// 010-0000-0000 형식으로 받아야함
+	private String phoneNumber;
 
 }

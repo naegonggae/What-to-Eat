@@ -2,24 +2,30 @@ package com.home.whattoeat.service;
 
 import com.home.whattoeat.config.auth.PrincipalDetails;
 import com.home.whattoeat.config.jwt.JwtTokenUtil;
+import com.home.whattoeat.domain.BaseEntity;
+import com.home.whattoeat.domain.Comment;
+import com.home.whattoeat.domain.Reply;
+import com.home.whattoeat.domain.Review;
 import com.home.whattoeat.dto.member.LoginRequest;
-import com.home.whattoeat.dto.member.LoginResponse;
-import com.home.whattoeat.dto.member.MemberFindAllResponse;
-import com.home.whattoeat.dto.member.MemberFindOneResponse;
+import com.home.whattoeat.dto.member.MemberFindResponse;
 import com.home.whattoeat.dto.member.MemberSaveRequest;
 import com.home.whattoeat.dto.member.MemberSaveResponse;
 import com.home.whattoeat.dto.member.MemberUpdateRequest;
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.dto.member.TokenResponse;
+import com.home.whattoeat.exception.member.ConstraintViolationMemberException;
 import com.home.whattoeat.exception.member.DuplicateEmailException;
 import com.home.whattoeat.exception.member.DuplicateUsernameException;
 import com.home.whattoeat.exception.member.NoSuchMemberException;
+import com.home.whattoeat.repository.CommentRepository;
 import com.home.whattoeat.repository.MemberRepository;
+import com.home.whattoeat.repository.ReplyRepository;
+import com.home.whattoeat.repository.ReviewRepository;
+import com.home.whattoeat.repository.restaurant.RestaurantRepository;
 import jakarta.persistence.EntityManager;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,78 +42,62 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
+	private final RestaurantRepository restaurantRepository;
+	private final ReviewRepository reviewRepository;
+	private final CommentRepository commentRepository;
+	private final ReplyRepository replyRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final JwtTokenUtil jwtTokenUtil;
-	@Autowired
-	EntityManager em;
 
 	// 회원가입
 	@Transactional
 	public MemberSaveResponse saveMember(MemberSaveRequest request) {
-		String username = request.getUsername();
-		System.out.println("username = " + username);;
 
-		// 이미 가입된 회원인지 확인
-		boolean findEmail = memberRepository.existsByEmail(request.getEmail());
-		if (findEmail) throw new DuplicateEmailException();
-		boolean findUsername = memberRepository.existsByUsername(request.getUsername());
-		if (findUsername) throw new DuplicateUsernameException();
+		// 이미 가입된 회원인지 중복체크
+		isDuplicatedEmail(request.getEmail());
+		isDuplicatedUsername(request.getUsername());
 
-		// 이메일 형식 체크해야하나
-		// 저장 근데 member 저장할때는 받을 수 있는건 다 입력받아야하는거 아님?
+		// 이메일 형식 체크해야하나, 전화번호 형식 체크 어디서해
 		// 패스워드 암호화
 		String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
-		Member member = Member.builder()
-				.username(request.getUsername())
-				.password(encodedPassword)
-				.email(request.getEmail())
-				.build();
+		Member member = Member.createMember(request, encodedPassword);
 
 		Member saveMember = memberRepository.save(member);
 		return MemberSaveResponse.form(saveMember);
 	}
 
-	public TokenResponse login(LoginRequest loginRequest) {
 
-		// 이거 없어도 되지않을까?
-//		Member findMember = memberRepository.findByUsername(loginRequest.getUsername())
-//				.orElseThrow(NoSuchMemberException::new);
+	// 로그인
+	public TokenResponse login(LoginRequest loginRequest) {
 
 		UsernamePasswordAuthenticationToken authenticationToken =
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
 
-		System.out.println("authenticationManagerBuilder 로 실제 인증을 시작합니다.");
-		//3. 실제 인증
-		//DaoAuthenticationProvider class 내 additionalAuthenticationChecks() 메소드로 비밀번호 체크
+		System.out.println("memberService-login authenticationManagerBuilder 로 실제 인증을 시작합니다.");
+		// 실제 인증 - DaoAuthenticationProvider class 내 additionalAuthenticationChecks() 메소드로 비밀번호 체크
 		Authentication authentication = authenticationManagerBuilder.getObject()
 				.authenticate(authenticationToken);
-		log.info("authentication.getName:" + authentication.getName());
-		log.info("authentication getAuthorities" + authentication.getAuthorities());
-		System.out.println(authentication.getPrincipal());
-		System.out.println(authentication.getCredentials());
-		System.out.println(authentication.getDetails());
 
 		PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-		//4.인증 정보 기반으로 JWT 토큰 생성 >> refresh, access token 둘 다 생성
+		// 엑세스 토큰 생성
 		TokenResponse tokenResponse = jwtTokenUtil.createToken(principalDetails);
 
 		return tokenResponse;
 
 	}
 
-	// 전체 조회
-	public Page<MemberFindAllResponse> findAll(Pageable pageable) {
-		return memberRepository.findAll(pageable).map(MemberFindAllResponse::from);
+	// 이용 x - 모든 회원 조회
+	public Page<MemberFindResponse> findAll(Pageable pageable) {
+		return memberRepository.findAll(pageable).map(MemberFindResponse::from);
 	}
 
-	// 단건 조회
-	public MemberFindOneResponse findOne(Long id) {
+	// 이용 x - 단건 조회
+	public MemberFindResponse findOne(Long id) {
 		Member findMember = memberRepository.findById(id)
 				.orElseThrow(NoSuchMemberException::new);
-		return MemberFindOneResponse.from(findMember);
+		return MemberFindResponse.from(findMember);
 	}
 
 	// 회원 수정
@@ -116,15 +106,13 @@ public class MemberService {
 		Member findMember = memberRepository.findById(id)
 				.orElseThrow(NoSuchMemberException::new);
 
-		// 이름이 변경되었으면 다른 이름들이랑 중복체크해줘
+		// 변경하고자하는 이름이 중복된 이름일때
 		if (!findMember.getUsername().equals(request.getUsername())) {
-			boolean findUsername = memberRepository.existsByUsername(request.getUsername());
-			if (findUsername) throw new DuplicateUsernameException();
+			isDuplicatedUsername(request.getUsername());
 		}
-		// 이메일이 변경되었으면 다른 이메일들이랑 중복체크해줘
+		// 변경하고자하는 이메일이 중복된 이메일일때
 		if (!findMember.getEmail().equals(request.getEmail())) {
-			boolean findEmail = memberRepository.existsByEmail(request.getEmail());
-			if (findEmail) throw new DuplicateEmailException();
+			isDuplicatedEmail(request.getEmail());
 		}
 
 		findMember.update(request);
@@ -136,29 +124,33 @@ public class MemberService {
 		Member findMember = memberRepository.findById(id)
 				.orElseThrow(NoSuchMemberException::new);
 
-		// 여기에 삭제하기 전에 날짜를 표시할건지 아니면 배송중인 음식이 있는지 등 확인
-		// 음식점과 메뉴들이 삭제 되는데 괜찮냐
-		// 진행중인 배송이 있는 체크
-		// 이벤트 체크
+		// 진행중인 주문이 있는지(사장님과의 상호작용이 필요하기 때문에 현재는 주문이 생성되면 주문이 마무리된것으로 취급)
+		// 회원탈퇴하기 전 보유한 식당을 삭제해야함
+		boolean existsByMember = restaurantRepository.existsByMember(findMember);
+		if (existsByMember) throw new ConstraintViolationMemberException();
 
-		// 직접삭제
-//		memberRepository.delete(findMember);
+		// 리뷰나 댓글 대댓글은 소프트 삭제
+		List<Review> findReviews = reviewRepository.findAllByMember(findMember);
+		findReviews.stream().forEach(BaseEntity::softDelete);
+		List<Comment> findComments = commentRepository.findAllByMember(findMember);
+		findComments.stream().forEach(BaseEntity::softDelete);
+		List<Reply> findReplies = replyRepository.findAllByMember(findMember);
+		findReplies.stream().forEach(BaseEntity::softDelete);
 
 		// 소프트 삭제
+		// 추후 일정기간이후 벌크성 삭제 로직 필요
 		findMember.softDelete();
-//		memberRepository.saveAndFlush(findMember);
-//		em.flush();
-//		em.clear();
-//		if (em.contains(findMember)) {
-//			// 엔티티가 영속성 컨텍스트에 존재하는 경우
-////			em.evict(findMember); // 영속성 컨텍스트에서 제거
-//			System.out.println("아직 캐시에 남아있소");
-//		}
-//		Member member = memberRepository.findById(findMember.getId()).orElseThrow();
-//		System.out.println(member.getDeletedAt());
 	}
 
-	// 비밀번호 변경
-	// 로그인?
+	private void isDuplicatedUsername(String username) {
+		boolean findUsername = memberRepository.existsByUsername(username);
+		if (findUsername) throw new DuplicateUsernameException();
+	}
+
+	private void isDuplicatedEmail(String email) {
+		boolean findEmail = memberRepository.existsByEmail(email);
+		if (findEmail) throw new DuplicateEmailException();
+	}
+
 }
 

@@ -1,22 +1,23 @@
 package com.home.whattoeat.dto.member;
 
 import com.home.whattoeat.domain.Member;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class MemberFindOneResponse {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class MemberFindResponse {
 
 	private Long id;
 	private String username;
 	private String email;
-	private String password;
+	private String phoneNumber;
 
-	public static MemberFindOneResponse from(Member member) {
-		return new MemberFindOneResponse(
+	public static MemberFindResponse from(Member member) {
+		return new MemberFindResponse(
 				member.getId(),
 				member.getUsername(),
 				member.getEmail(),

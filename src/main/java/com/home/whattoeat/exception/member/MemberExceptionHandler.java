@@ -33,4 +33,10 @@ public class MemberExceptionHandler {
 				.body(Response.error(new ErrorResponse(e.getStatus(), e.getStatus().value(), e.getMessage())));
 	}
 
+	@ExceptionHandler(ConstraintViolationMemberException.class)
+	public ResponseEntity<?> constraintViolationMemberException(ConstraintViolationMemberException e) {
+		return ResponseEntity.status(e.getStatus())
+				.body(Response.error(new ErrorResponse(e.getStatus(), e.getStatus().value(), e.getMessage())));
+	}
+
 }
