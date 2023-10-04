@@ -44,7 +44,7 @@ public class CategoryService {
 		Category findCategory = categoryRepository.findById(id)
 				.orElseThrow(NoSuchCategoryException::new);
 
-		return CategoryFindResponse.from(findCategory.getId());
+		return CategoryFindResponse.from(findCategory);
 	}
 
 	// 수정
@@ -64,7 +64,11 @@ public class CategoryService {
 				.orElseThrow(NoSuchCategoryException::new);
 
 		// 카테고리를 사용하는 곳이 있으면 카테고리 리스트에서 다 제외 시켜주기
-		findCategory.softDelete();
+		// 레스토랑 카테고리와 레스토랑에서 카테고리 제외시켜줘야함
+
+		categoryRepository.deleteById(id);
+		// 이걸 삭제하려면 해당 카테고리를 포함한 식당 전부 조회하고 카테고리 리스트에서 해당 카테고리를 삭제 혹은 수정해야한다. 벌크연산으로 삭제 해야함
+//		categoryRepository.deleteById(id);
 	}
 
 }
