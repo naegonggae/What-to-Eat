@@ -34,54 +34,56 @@ public class CommentService {
 		// 일반손님용
 		Comment comment = Comment.createComment(request, findReview, member);
 
-		// 댓글 다는 사람이 사장님이면 가게사장님입니다. 표시
+		// 댓글 다는 사람이 사장님이면 "가게사장님입니다." 표시
 		if (member.getUsername().equals(findReview.getRestaurant().getMember().getUsername())) {
 			comment = Comment.createOwnerComment(request, findReview, member);
 		}
 
-
 		Comment savedComment = commentRepository.save(comment);
-		return CommentSaveResponse.from(savedComment.getId());
+		return CommentSaveResponse.from(savedComment);
 	}
 
 	// 리뷰내 댓글 전체 조회
 	public Page<CommentFindResponse> findAll(Long rstId, Pageable pageable) {
-
 		Review findReview = reviewRepository.findById(rstId)
 				.orElseThrow(NoSuchReviewException::new);
 		return commentRepository.findAllByReview(findReview, pageable).map(CommentFindResponse::from);
 	}
 
-	// 수정
+	// 댓글 수정
 	@Transactional
 	public void update(CommentUpdateRequest request, Long reviewId, Long cmtId, Member member) {
-		Review findReview = reviewRepository.findById(reviewId)
-				.orElseThrow(NoSuchReviewException::new);
+		Comment findComment = isExistedReviewAndComment(reviewId, cmtId);
 
-		Comment findComment = commentRepository.findById(cmtId)
-				.orElseThrow(NoSuchCommentException::new);
-
-		if (!findComment.getMember().getUsername().equals(member.getUsername())) {
-			throw new AccessDeniedException();
-		}
+		hasPermission(member, findComment);
 
 		findComment.update(request);
 	}
 
+
 	// 삭제
 	@Transactional
 	public void delete(Long reviewId, Long cmtId, Member member) {
+		Comment findComment = isExistedReviewAndComment(reviewId, cmtId);
+
+		hasPermission(member, findComment);
+
+		commentRepository.deleteById(cmtId);
+	}
+
+	private Comment isExistedReviewAndComment(Long reviewId, Long cmtId) {
 		Review findReview = reviewRepository.findById(reviewId)
 				.orElseThrow(NoSuchReviewException::new);
 
 		Comment findComment = commentRepository.findById(cmtId)
 				.orElseThrow(NoSuchCommentException::new);
+		return findComment;
+	}
 
+	private static void hasPermission(Member member, Comment findComment) {
 		if (!findComment.getMember().getUsername().equals(member.getUsername())) {
 			throw new AccessDeniedException();
 		}
-
-		findComment.softDelete();
 	}
 
 }

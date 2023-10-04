@@ -50,6 +50,7 @@ public class Restaurant extends BaseEntity {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE) // 식당을 삭제하면 메뉴도 삭제
 	private List<Menu> menuList = new ArrayList<>();
 
@@ -102,83 +103,49 @@ public class Restaurant extends BaseEntity {
 		}
 	}
 
-	// 리뷰를 작성하면 오를게 아니라 주문을 할때 올라야할듯 주문수만
-	// 회원이 리뷰를 삭제했을때도 별점 관리 해줘 리뷰수랑
+	// 리뷰 작성시 별점 구하는 로직
 	public void updateInfo(ReviewSaveRequest request) {
 		this.starRating = getAvgRating(request.getStarRating());
 		this.reviewCount++;
-		this.numberOfOrders++;
 	}
-
-	// 별점은 더블로 소수점단위로 보여주다가 화면에 보여줄때만 소수점 첫째까지만 보여줘
 	public double getAvgRating(Double newRating) {
-		System.out.println("getAvgRating===========");
-		System.out.println("starRating = " + starRating);
-		System.out.println("reviewCount = " + reviewCount);
-		System.out.println("newRating = " + newRating);
-		if (reviewCount == 0) {
-			return newRating;
-		} else {
+		if (reviewCount == 0) return newRating;
+		else {
 			double ratingSum = starRating * reviewCount;
-			System.out.println("ratingSum = " + ratingSum);
 			ratingSum += newRating;
-			System.out.println("ratingSum = " + ratingSum);
-			double newAvgRating = ratingSum / (reviewCount + 1);
-			System.out.println("newAvgRating = " + newAvgRating);
-			double roundedRating = Math.round(newAvgRating * 10.0) / 10.0;
-
-			return roundedRating;
+			return ratingSum / (reviewCount + 1);
 		}
 	}
 
+	// 별점 수정시 값반영
 	public void updateNewRatingInfo(ReviewUpdateRequest request, Double oldRating) {
 		this.starRating = getUpdateAvgRating(request.getStarRating(), oldRating);
 	}
 	public double getUpdateAvgRating(Double newRating, Double oldRating) {
-		System.out.println("getUpdateAvgRating===========");
-		System.out.println("starRating = " + starRating);
-		System.out.println("reviewCount = " + reviewCount);
-		System.out.println("newRating = " + newRating);
-		if (reviewCount - 1 == 0) {
-			return newRating;
-		} else {
+		if (reviewCount - 1 == 0) return newRating;
+		else {
 			double ratingSum = starRating * reviewCount;
-			System.out.println("ratingSum = " + ratingSum);
-
 			ratingSum = ratingSum + newRating - oldRating;
-			System.out.println("ratingSum = " + ratingSum);
-
-			double newAvgRating = ratingSum / (reviewCount);
-			System.out.println("newAvgRating = " + newAvgRating);
-			double roundedRating = Math.round(newAvgRating * 10.0) / 10.0;
-
-			return roundedRating;
+			return ratingSum / (reviewCount);
 		}
 	}
 
+	// 리뷰삭제시 별점도 삭제 되어 값반영
 	public void excludeRatings(Double rating) {
 		this.starRating = deleteRating(rating);
 		this.reviewCount--;
 	}
 	public Double deleteRating(Double rating) {
-		System.out.println("deleteRating===========");
-		System.out.println("starRating = " + starRating);
-		System.out.println("reviewCount = " + reviewCount);
-		System.out.println("rating = " + rating);
-		if (reviewCount - 1 == 0) {
-			return 0.0;
-		} else {
+		if (reviewCount - 1 == 0) return 0.0;
+		else {
 			double ratingSum = starRating * reviewCount;
-			System.out.println("ratingSum = " + ratingSum);
-
 			ratingSum -= rating;
-			System.out.println("ratingSum = " + ratingSum);
-
-			double newAvgRating = ratingSum / (reviewCount - 1);
-			System.out.println("newAvgRating = " + newAvgRating);
-			double roundedRating = Math.round(newAvgRating * 10.0) / 10.0;
-
-			return roundedRating;
+			return ratingSum / (reviewCount - 1);
 		}
+	}
+
+	// 주문시 식당의 주문수가 하나씩 오름
+	public void increaseOrderCount() {
+		this.numberOfOrders++;
 	}
 }
