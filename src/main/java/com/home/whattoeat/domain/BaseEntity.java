@@ -14,8 +14,8 @@ public class BaseEntity {
 	@Column(updatable = false)
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
+//	@Column(name = "deleted_at")
+//	private LocalDateTime deletedAt;
 
 	@PrePersist
 	public void prePersist() {
@@ -30,9 +30,9 @@ public class BaseEntity {
 		updatedAt = now;
 	}
 
-	public void softDelete() {
-		LocalDateTime now = LocalDateTime.now();
-		deletedAt = now;
-	}
+//	public void softDelete() {
+//		LocalDateTime now = LocalDateTime.now();
+//		deletedAt = now;
+//	}
 
 }
