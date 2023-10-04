@@ -1,5 +1,6 @@
 package com.home.whattoeat.service;
 
+import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.Menu;
 import com.home.whattoeat.domain.Restaurant;
 import com.home.whattoeat.dto.menu.MenuSaveRequest;
@@ -27,96 +28,89 @@ public class MenuService {
 
 	// 메뉴 등록
 	@Transactional
-	public MenuSaveResponse save(MenuSaveRequest request, Long id, String username) {
-		// 시큐리티에 유저정보일텐데 굳이 검사해야함? ㅇㅇ 안해도 됨
-//		Member findMember = memberRepository.findByUsername(username)
-//				.orElseThrow(NoSuchMemberException::new);
+	public MenuSaveResponse save(MenuSaveRequest request, Long id, Member member) {
 
-		Restaurant findRestaurant = restaurantRepository.findById(id)
-				.orElseThrow(NoSuchRestaurantException::new);
+		Restaurant findRestaurant = findRestaurant(id);
 
-		// 명시된 레스토랑 아이디로 식당 조회 -> 그 식당이 내가 만든 식당인지 확인
-		if (!username.equals(findRestaurant.getMember().getUsername())) throw new AccessDeniedException();
+		// 메뉴등록은 식당을 만든 사람만 가능
+		hasPermission(member.getUsername().equals(findRestaurant.getMember().getUsername()));
 
 		// 내가 만든걸로 검증된 식당을 새로운 메뉴 등록할때 사용
-		Menu menu = Menu.builder()
-				.name(request.getName())
-				.description(request.getDescription())
-				.price(request.getPrice())
-				.restaurant(findRestaurant)
-				.build();
+		Menu menu = Menu.createMenu(request, findRestaurant);
 
 		Menu savedMenu = menuRepository.save(menu);
 		return MenuSaveResponse.from(savedMenu);
 	}
-	// 내가 등록한 식당의 메뉴 단건 조회
-	public MenuFindResponse findOne(Long rstId, Long menuId, String username) {
+	// 이용 x - 메뉴 단건 조회
+	public MenuFindResponse findOne(Long rstId, Long menuId) {
 
-		Restaurant findRestaurant = restaurantRepository.findById(rstId)
-				.orElseThrow(NoSuchRestaurantException::new);
+		Restaurant findRestaurant = findRestaurant(rstId);
 
-		// 명시된 레스토랑 아이디로 식당 조회 -> 그 식당이 내가 만든 식당인지 확인
-		if (!username.equals(findRestaurant.getMember().getUsername())) throw new AccessDeniedException();
+		Menu findMenu = findMenu(menuId);
 
-		Menu findMenu = menuRepository.findById(menuId)
-				.orElseThrow(NoSuchMenuException::new);
-
-		// 명시된 메뉴 아이디로 메뉴를 조회 -> 그 메뉴가 속한 식당이 내가 만든 식당인지 확인
-		if (!findMenu.getRestaurant().equals(findRestaurant)) throw new AccessDeniedException();
+		// 메뉴에 저장된 식당이 파라미터로 받아온 식당인지
+		isSameRestaurant(findMenu.getRestaurant().equals(findRestaurant));
 
 		return MenuFindResponse.from(findMenu);
 	}
 
-	// 내가 등록한 식당 메뉴 전체 조회
-	public Page<MenuFindResponse> findAll(Long rstId, Pageable pageable, String username) {
-		Restaurant findRestaurant = restaurantRepository.findById(rstId)
-				.orElseThrow(NoSuchRestaurantException::new);
-
-		// 명시된 레스토랑 아이디로 식당 조회 -> 그 식당이 내가 만든 식당인지 확인
-		if (!username.equals(findRestaurant.getMember().getUsername())) throw new AccessDeniedException();
-
-		// 내가 만든 식당의 메뉴를 전부가져오는 findAllByRestaurant 사용
+	// 식당 메뉴 전체 조회
+	public Page<MenuFindResponse> findAll(Long rstId, Pageable pageable) {
+		Restaurant findRestaurant = findRestaurant(rstId);
 		return menuRepository.findAllByRestaurant(findRestaurant, pageable).map(MenuFindResponse::from);
 	}
 
 	// 메뉴 수정
 	@Transactional
-	public void update(MenuUpdateRequest request, Long rstId, Long menuId, String username) {
+	public void update(MenuUpdateRequest request, Long rstId, Long menuId, Member member) {
 
-		Restaurant findRestaurant = restaurantRepository.findById(rstId)
-				.orElseThrow(NoSuchRestaurantException::new);
+		Restaurant findRestaurant = findRestaurant(rstId);
 
-		// 명시된 레스토랑 아이디로 식당 조회 -> 그 식당이 내가 만든 식당인지 확인
-		if (!username.equals(findRestaurant.getMember().getUsername())) throw new AccessDeniedException();
+		Menu findMenu = findMenu(menuId);
 
-		Menu findMenu = menuRepository.findById(menuId)
-				.orElseThrow(NoSuchMenuException::new);
+		// 메뉴 수정은 식당을 만든 사람만 가능
+		hasPermission(member.getUsername().equals(findRestaurant.getMember().getUsername()));
 
-		// 명시된 메뉴 아이디로 메뉴를 조회 -> 그 메뉴가 속한 식당이 내가 만든 식당인지 확인
-		if (!findMenu.getRestaurant().equals(findRestaurant)) throw new AccessDeniedException();
+		// 메뉴에 저장된 식당과 파라미터로 받아온 식당이 같은지 확인
+		isSameRestaurant(findMenu.getRestaurant().equals(findRestaurant));
 
 		findMenu.update(request);
 	}
 
 	// 메뉴 삭제
 	@Transactional
-	public void delete(Long rstId, Long menuId, String username) {
-		Restaurant findRestaurant = restaurantRepository.findById(rstId)
-				.orElseThrow(NoSuchRestaurantException::new);
+	public void delete(Long rstId, Long menuId, Member member) {
+		Restaurant findRestaurant = findRestaurant(rstId);
 
-		// 명시된 레스토랑 아이디로 식당 조회 -> 그 식당이 내가 만든 식당인지 확인
-		if (!username.equals(findRestaurant.getMember().getUsername())) throw new AccessDeniedException();
+		Menu findMenu = findMenu(menuId);
 
-		Menu findMenu = menuRepository.findById(menuId)
-				.orElseThrow(NoSuchMenuException::new);
+		// 메뉴 삭제는 식당을 만든 사람만 가능
+		hasPermission(member.getUsername().equals(findRestaurant.getMember().getUsername()));
 
-		// 명시된 메뉴 아이디로 메뉴를 조회 -> 그 메뉴가 속한 식당이 내가 만든 식당인지 확인
-		if (!findMenu.getRestaurant().equals(findRestaurant)) throw new AccessDeniedException();
+		// 메뉴에 저장된 식당과 파라미터로 받아온 식당이 같은지 확인
+		isSameRestaurant(findMenu.getRestaurant().equals(findRestaurant));
 
-		// 이걸 주문한 손님은 없나 확인
-//		menuRepository.delete(findMenu);
-		findMenu.softDelete();
+		menuRepository.deleteById(menuId);
 	}
 
+	private Menu findMenu(Long menuId) {
+		Menu findMenu = menuRepository.findById(menuId)
+				.orElseThrow(NoSuchMenuException::new);
+		return findMenu;
+	}
+
+	private Restaurant findRestaurant(Long rstId) {
+		Restaurant findRestaurant = restaurantRepository.findById(rstId)
+				.orElseThrow(NoSuchRestaurantException::new);
+		return findRestaurant;
+	}
+
+	private static void isSameRestaurant(boolean findMenu) {
+		if (!findMenu) throw new AccessDeniedException();
+	}
+
+	private static void hasPermission(boolean member) {
+		isSameRestaurant(member);
+	}
 
 }
