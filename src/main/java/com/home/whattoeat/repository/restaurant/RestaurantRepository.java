@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantRepositoryCustom {
 
+	boolean existsByName(String name);
 	Optional<Restaurant> findByName(String name);
 	Page<Restaurant> findAllByMember(Member member, Pageable pageable);
+	boolean existsByMember(Member member);
 }

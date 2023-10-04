@@ -9,9 +9,7 @@ import static org.springframework.util.StringUtils.hasText;
 
 import com.home.whattoeat.domain.Order;
 import com.home.whattoeat.domain.Restaurant;
-import com.home.whattoeat.dto.restuarant.QRestaurantCategoryDto;
 import com.home.whattoeat.dto.restuarant.RstCategoryCondition;
-import com.home.whattoeat.dto.restuarant.RestaurantCategoryDto;
 import com.home.whattoeat.dto.restuarant.RstSearchCondition;
 import com.home.whattoeat.dto.restuarant.RstSearchKeyword;
 import com.home.whattoeat.exception.reataurant.NoSuchKeywordException;
@@ -108,6 +106,8 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 			orderSpecifier = restaurant.starRating.desc();
 		} else if ("numberOfOrders".equals(condition.getSortBy())) {
 			orderSpecifier = restaurant.numberOfOrders.desc();
+		} else if ("reviewCount".equals(condition.getSortBy())) {
+			orderSpecifier = restaurant.reviewCount.desc();
 		}
 		return orderSpecifier;
 	}

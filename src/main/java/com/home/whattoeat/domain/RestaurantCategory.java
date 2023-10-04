@@ -1,24 +1,21 @@
 package com.home.whattoeat.domain;
 
+import static lombok.AccessLevel.PROTECTED;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import java.util.List;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-//@Builder
-//@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-//@AllArgsConstructor
+@AllArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 public class RestaurantCategory {
 
 	@Id @GeneratedValue
@@ -28,10 +25,10 @@ public class RestaurantCategory {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Category category;
 
-	@ManyToOne(fetch = FetchType.LAZY) // 뭔가 지워도 될 느낌
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Restaurant restaurant;
 
-	// 연관관계 메서드 //
+	// 연관관계 메서드 // 없애면 절대 안됨 없애면 식당을 등록했을때 레스토랑 카테고리에 레스토랑 아이디맵핑이 안됨
 	public void addRestaurant(Restaurant restaurant) {
 		this.restaurant = restaurant;
 	}
@@ -44,7 +41,4 @@ public class RestaurantCategory {
 		this.category = category;
 	}
 
-
-//	public void addRestaurantCategory(RestaurantCategory rc) {
-//	}
 }

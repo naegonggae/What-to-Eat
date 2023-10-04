@@ -3,7 +3,7 @@ package com.home.whattoeat.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.home.whattoeat.config.auth.PrincipalDetails;
-import com.home.whattoeat.dto.member.LoginRequest;
+import com.home.whattoeat.dto.member.MemberLoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,19 +34,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		// 1. 유저의 request 에 있는 username 과 password 를 파싱해서 자바 Object 로 받기
 		ObjectMapper om = new ObjectMapper();
-		LoginRequest loginRequestDto = null;
+		MemberLoginRequest memberLoginRequestDto = null;
 		try {
-			loginRequestDto = om.readValue(request.getInputStream(), LoginRequest.class);
+			memberLoginRequestDto = om.readValue(request.getInputStream(), MemberLoginRequest.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		System.out.println("JwtAuthenticationFilter : " + loginRequestDto.toString());
+		System.out.println("JwtAuthenticationFilter : " + memberLoginRequestDto.toString());
 
 		// 2. username, password 토큰 생성
 		UsernamePasswordAuthenticationToken authenticationToken =
-				new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(),
-						loginRequestDto.getPassword());
+				new UsernamePasswordAuthenticationToken(memberLoginRequestDto.getUsername(),
+						memberLoginRequestDto.getPassword());
 
 		System.out.println("JwtAuthenticationFilter : 토큰생성완료");
 

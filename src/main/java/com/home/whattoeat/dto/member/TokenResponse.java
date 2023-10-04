@@ -1,16 +1,18 @@
 package com.home.whattoeat.dto.member;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class TokenResponse {
 
 	private String accessToken;
 
-	public static TokenResponse form(String token) {
-		return new TokenResponse(token);
+	public static TokenResponse form(String accessToken) {
+		return new TokenResponse(accessToken);
 	}
-
 }

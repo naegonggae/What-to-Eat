@@ -2,7 +2,6 @@ package com.home.whattoeat.dto.restuarant;
 
 import com.home.whattoeat.domain.Address;
 import com.home.whattoeat.domain.Restaurant;
-import jakarta.persistence.Embedded;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class RstSaveResponse {
+public class RstFindResponse {
 
 	private Long id;
 	private String name;
@@ -24,8 +23,8 @@ public class RstSaveResponse {
 	private Integer maxOrderAmount;
 	private Integer reviewCount;
 
-	public static RstSaveResponse from(Restaurant restaurant) {
-		return new RstSaveResponse(
+	public static RstFindResponse from(Restaurant restaurant) {
+		return new RstFindResponse(
 				restaurant.getId(),
 				restaurant.getName(),
 				restaurant.getPhoneNumber(),

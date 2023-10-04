@@ -1,12 +1,18 @@
 package com.home.whattoeat.domain;
 
+import static lombok.AccessLevel.PROTECTED;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.home.whattoeat.dto.restuarant.RstSaveRequest;
 import com.home.whattoeat.dto.restuarant.RstUpdateRequest;
 import com.home.whattoeat.dto.review.ReviewSaveRequest;
 import com.home.whattoeat.dto.review.ReviewUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -16,14 +22,13 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Getter @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@AllArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 public class Restaurant extends BaseEntity {
 
 	@Id @GeneratedValue
@@ -31,86 +36,81 @@ public class Restaurant extends BaseEntity {
 	private Long id;
 	private String name;
 	private String phoneNumber;
-	private String cuisineType; // enum
-
+	private String description;
+	@Embedded
 	private Address address;
-	private double starRating; // 리뷰할때 구현
-	private Long numberOfOrders; // 리뷰할때 구현 지금은 하드 코딩해버리자
-	private int minOrderAmount;
-	private int maxOrderAmount;
-	private int reviewCount;
-
-	// 영업시간
-	// 가게 소개
-	// 평균가격
-	// 사진
-	// 예약 가능여부
-	// 위도경도
-	// 평점
-	// 운영자 정보
-	// 온라인 예약 링크, 인스타 링크
-	// 결제 수단
-	// 예약 현황
-	// 운영 중단 일정
-	// 프로모션 정보
-
+	private Double starRating;
+	private Long numberOfOrders;
+	private Integer minOrderAmount;
+	private Integer maxOrderAmount;
+	private Integer reviewCount;
+	@Enumerated(EnumType.STRING)
+	private RestaurantStatus status; // OPEN, CLOSED, VACATION; // 사장님 전용어플 만들 때까지 항상 OPEN 으로 유지
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@OneToMany(mappedBy = "restaurant")
+	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE) // 식당을 삭제하면 메뉴도 삭제
 	private List<Menu> menuList = new ArrayList<>();
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE) // 식당을 삭제하면 식당리뷰도 삭제
+	private List<Review> reviewList = new ArrayList<>();
+
+	@JsonIgnore
 	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-	private List<RestaurantCategory> restaurantCategories = new ArrayList<>();
+	private List<RestaurantCategory> restaurantCategoryList = new ArrayList<>();
 
 	// 연관관계 메서드 //
 	public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
-		restaurantCategories.add(restaurantCategory);
+		restaurantCategoryList.add(restaurantCategory);
 		restaurantCategory.addRestaurant(this);
 	}
 
-	// 비즈니스 메서드 //
-	public void update(RstUpdateRequest request, List<RestaurantCategory> restaurantCategories) {
+	// 생성 메서드 //
+	public static Restaurant createRestaurant(RstSaveRequest request, Member member, List<RestaurantCategory> restaurantCategoryList){
+		return new Restaurant(request, member, restaurantCategoryList);
+	}
+	public Restaurant(RstSaveRequest request, Member member, List<RestaurantCategory> restaurantCategoryList) {
 		this.name = request.getName();
 		this.phoneNumber = request.getPhoneNumber();
-		this.starRating = request.getStarRating();
-		this.numberOfOrders = request.getNumberOfOrders();
+		this.description = request.getDescription();
+		this.address = Address.createAddress(request.getCity(), request.getStreet(), request.getZipcode());
+		this.starRating = 0.0;
+		this.numberOfOrders = 0L;
 		this.minOrderAmount = request.getMinOrderAmount();
 		this.maxOrderAmount = request.getMaxOrderAmount();
-		this.restaurantCategories = restaurantCategories;
+		for (RestaurantCategory rc : restaurantCategoryList) {
+			this.addRestaurantCategory(rc);
+		}
+		this.reviewCount = 0;
+		this.status = RestaurantStatus.OPEN;
+		this.member = member;
 	}
 
-	// 생성 메서드 //
-	// 식당 생성
-	public static Restaurant createRestaurant(RstSaveRequest request, Member member, List<RestaurantCategory> restaurantCategories){
-		return new Restaurant(request, member, restaurantCategories);
-	}
-	public Restaurant(RstSaveRequest request, Member member, List<RestaurantCategory> restaurantCategories) {
+	// 비즈니스 메서드 //
+	public void update(RstUpdateRequest request, List<RestaurantCategory> restaurantCategoryList) {
 		this.name = request.getName();
 		this.phoneNumber = request.getPhoneNumber();
-		this.starRating = request.getStarRating();
-		this.numberOfOrders = request.getNumberOfOrders();
+		this.description = request.getDescription();
+		this.address = Address.createAddress(request.getCity(), request.getStreet(),
+				request.getZipcode());
 		this.minOrderAmount = request.getMinOrderAmount();
 		this.maxOrderAmount = request.getMaxOrderAmount();
-		this.member = member;
-		for (RestaurantCategory rc : restaurantCategories) {
+		for (RestaurantCategory rc : restaurantCategoryList) {
 			this.addRestaurantCategory(rc);
-			// 연관관계 메서드 어떻게 반영하지 그리고 ... 이거 꼭 써야하나 하나씩 저장하고 있는데
-			// 이거다 ㅎㅎ 카테고리를 여러개 쓰고 저장을 하면 이렇게 될 수 밖에 없음
-			// 나중에 파라미터가 아래 처럼 나올 수 있기 때문에
-			// (request, member, restaurantCategory, restaurantCategory, restaurantCategory, restaurantCategory)
-			// 그리고 생성하면서 반대편도 반영시켜줌 -> 연관관계 메서드
 		}
 	}
 
-
+	// 리뷰를 작성하면 오를게 아니라 주문을 할때 올라야할듯 주문수만
+	// 회원이 리뷰를 삭제했을때도 별점 관리 해줘 리뷰수랑
 	public void updateInfo(ReviewSaveRequest request) {
 		this.starRating = getAvgRating(request.getStarRating());
 		this.reviewCount++;
 		this.numberOfOrders++;
 	}
 
+	// 별점은 더블로 소수점단위로 보여주다가 화면에 보여줄때만 소수점 첫째까지만 보여줘
 	public double getAvgRating(Double newRating) {
 		System.out.println("getAvgRating===========");
 		System.out.println("starRating = " + starRating);
