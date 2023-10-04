@@ -29,7 +29,7 @@ public class ReviewRestController {
 
 	private final ReviewService reviewService;
 
-	@PostMapping()
+	@PostMapping
 	public ResponseEntity<Response<ReviewSaveResponse>> save(@RequestBody ReviewSaveRequest request,
 			@PathVariable Long rstId, @AuthenticationPrincipal PrincipalDetails details) {
 		ReviewSaveResponse result = reviewService.save(request, details.getMember(), rstId);
@@ -37,7 +37,7 @@ public class ReviewRestController {
 				.body(Response.success(result));
 	}
 
-	@GetMapping()
+	@GetMapping
 	public ResponseEntity<Response<Page<ReviewFindResponse>>> findAll(@PathVariable Long rstId,
 			Pageable pageable) {
 		Page<ReviewFindResponse> result = reviewService.findAll(rstId, pageable);

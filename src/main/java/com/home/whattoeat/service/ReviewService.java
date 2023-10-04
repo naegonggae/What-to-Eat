@@ -37,18 +37,17 @@ public class ReviewService {
 		findRestaurant.updateInfo(request);
 
 		Review savedReview = reviewRepository.save(review);
-		return ReviewSaveResponse.from(savedReview.getId());
+		return ReviewSaveResponse.from(savedReview);
 	}
 
-	// 전체 조회
+	// 식당 내 리뷰 전체 조회
 	public Page<ReviewFindResponse> findAll(Long rstId, Pageable pageable) {
-
 		Restaurant findRestaurant = restaurantRepository.findById(rstId)
 				.orElseThrow(NoSuchRestaurantException::new);
 		return reviewRepository.findAllByRestaurant(findRestaurant, pageable).map(ReviewFindResponse::from);
 	}
 
-	// 수정
+	// 리뷰 수정
 	@Transactional
 	public void update(ReviewUpdateRequest request, Long rstId, Long reviewId, Member member) {
 		Restaurant findRestaurant = restaurantRepository.findById(rstId)
@@ -57,18 +56,19 @@ public class ReviewService {
 		Review findReview = reviewRepository.findById(reviewId)
 				.orElseThrow(NoSuchReviewException::new);
 
+		// 기존의 별점
 		Double oldStarRating = findReview.getStarRating();
 
-		if (!findReview.getMember().getUsername().equals(member.getUsername())) {
-			throw new AccessDeniedException();
-		}
+		// 리뷰쓴사람이 수정하는 것인지 확인
+		hasPermission(member, findReview);
 
 		findReview.update(request);
 
+		// 별점 최신화
 		findRestaurant.updateNewRatingInfo(request, oldStarRating);
 	}
 
-	// 삭제
+	// 리뷰 삭제
 	@Transactional
 	public void delete(Long rstId, Long reviewId, Member member) {
 		Restaurant findRestaurant = restaurantRepository.findById(rstId)
@@ -77,14 +77,18 @@ public class ReviewService {
 		Review findReview = reviewRepository.findById(reviewId)
 				.orElseThrow(NoSuchReviewException::new);
 
+		// 리뷰쓴사람이 삭제하는 것인지 확인
+		hasPermission(member, findReview);
 
+		reviewRepository.deleteById(reviewId);
+
+		// 별점 최신화
+		findRestaurant.excludeRatings(findReview.getStarRating());
+	}
+
+	private static void hasPermission(Member member, Review findReview) {
 		if (!findReview.getMember().getUsername().equals(member.getUsername())) {
 			throw new AccessDeniedException();
 		}
-
-
-		findReview.softDelete();
-
-		findRestaurant.excludeRatings(findReview.getStarRating());
 	}
 }
