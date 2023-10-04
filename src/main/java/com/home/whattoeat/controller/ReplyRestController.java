@@ -37,7 +37,7 @@ public class ReplyRestController {
 				.body(Response.success(result));
 	}
 
-	@GetMapping()
+	@GetMapping
 	public ResponseEntity<Response<Page<ReplyFindResponse>>> findAllByComment(Pageable pageable,
 			@PathVariable Long cmtId) {
 		Page<ReplyFindResponse> result = replyService.findAll(cmtId, pageable);

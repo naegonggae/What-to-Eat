@@ -26,6 +26,7 @@ public class ReplyService {
 	private final ReplyRepository replyRepository;
 	private final CommentRepository commentRepository;
 
+	// 대댓글 작성
 	@Transactional
 	public ReplySaveResponse save(ReplySaveRequest request, Member member, Long cmtId) {
 		Comment findComment = commentRepository.findById(cmtId)
@@ -34,7 +35,7 @@ public class ReplyService {
 		// 일반 회원용
 		Reply reply = Reply.createReply(request, findComment, member);
 
-		// 댓글 다는 사람이 사장님이면 가게사장님입니다. 표시
+		// 댓글 다는 사람이 사장님이면 "가게 사장님입니다." 표시
 		if (member.getUsername().equals(findComment.getReview().getRestaurant().getMember().getUsername())) {
 			reply = Reply.createOwnerReply(request, findComment, member);
 		}
@@ -43,44 +44,48 @@ public class ReplyService {
 		return ReplySaveResponse.from(savedReply);
 	}
 
-	// 리뷰내 댓글 전체 조회
+	// 댓글 내 대댓글들 전체 조회
 	public Page<ReplyFindResponse> findAll(Long cmtId, Pageable pageable) {
-
 		Comment findComment = commentRepository.findById(cmtId)
 				.orElseThrow(NoSuchCommentException::new);
 		return replyRepository.findAllByComment(findComment, pageable).map(ReplyFindResponse::from);
 	}
 
-	// 수정
+	// 대댓글 수정
 	@Transactional
 	public void update(ReplyUpdateRequest request, Long cmtId, Long rpId, Member member) {
-		Comment findComment = commentRepository.findById(cmtId)
-				.orElseThrow(NoSuchCommentException::new);
+		Reply findReply = isExistedCommentAndReply(cmtId, rpId);
 
-		Reply findReply = replyRepository.findById(rpId)
-				.orElseThrow(NoSuchReplyException::new);
-
-		if (!findReply.getMember().getUsername().equals(member.getUsername())) {
-			throw new AccessDeniedException();
-		}
+		hasPermission(member, findReply);
 
 		findReply.update(request);
 	}
 
-	// 삭제
+
+	// 대댓글 삭제
 	@Transactional
 	public void delete(Long cmtId, Long rpId, Member member) {
+		Reply findReply = isExistedCommentAndReply(cmtId, rpId);
+
+		hasPermission(member, findReply);
+
+		replyRepository.deleteById(rpId);
+
+	}
+
+	private static void hasPermission(Member member, Reply findReply) {
+		if (!findReply.getMember().getUsername().equals(member.getUsername())) {
+			throw new AccessDeniedException();
+		}
+	}
+
+	private Reply isExistedCommentAndReply(Long cmtId, Long rpId) {
 		Comment findComment = commentRepository.findById(cmtId)
 				.orElseThrow(NoSuchCommentException::new);
 
 		Reply findReply = replyRepository.findById(rpId)
 				.orElseThrow(NoSuchReplyException::new);
-
-		if (!findReply.getMember().getUsername().equals(member.getUsername())) {
-			throw new AccessDeniedException();
-		}
-
-		findReply.softDelete();
+		return findReply;
 	}
 
 }
