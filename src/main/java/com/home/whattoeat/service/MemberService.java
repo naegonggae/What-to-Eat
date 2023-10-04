@@ -22,7 +22,6 @@ import com.home.whattoeat.repository.MemberRepository;
 import com.home.whattoeat.repository.ReplyRepository;
 import com.home.whattoeat.repository.ReviewRepository;
 import com.home.whattoeat.repository.restaurant.RestaurantRepository;
-import jakarta.persistence.EntityManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
