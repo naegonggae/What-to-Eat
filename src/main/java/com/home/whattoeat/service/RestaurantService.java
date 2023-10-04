@@ -87,7 +87,7 @@ public class RestaurantService {
 		System.out.println("====");
 		System.out.println(request.getCategoryName());
 
-		return restaurantRepository.searchRstByCategory(request, pageable);
+		return restaurantRepository.searchRstByCategory(request, pageable).map(RestaurantCategoryDto::from);
 	}
 
 	// 검색받은 카테고리인 식당에서 조건 검색조회
@@ -96,12 +96,12 @@ public class RestaurantService {
 		System.out.println("====");
 		System.out.println(request.getStarRating());
 
-		return restaurantRepository.searchRstByCondition(request, pageable);
+		return restaurantRepository.searchRstByCondition(request, pageable).map(RestaurantCategoryDto::from);
 	}
 
 	// 검색한 키워드의 카테고리를 가지고 있거나 식당이름에 키워드가 들어가면 조회
 	public Page<RestaurantCategoryDto> findAllByKeyword(RstSearchKeyword request, Pageable pageable) {
-		return restaurantRepository.searchRstByKeyword(request, pageable);
+		return restaurantRepository.searchRstByKeyword(request, pageable).map(RestaurantCategoryDto::from);
 	}
 
 	// 내가 등록한 식당 전체 조회

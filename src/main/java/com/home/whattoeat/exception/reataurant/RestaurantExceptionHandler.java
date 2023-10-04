@@ -15,4 +15,10 @@ public class RestaurantExceptionHandler {
 				.body(Response.error(new ErrorResponse(e.getStatus(), e.getStatus().value(), e.getMessage())));
 	}
 
+	@ExceptionHandler(NoSuchKeywordException.class)
+	public ResponseEntity<?> noSuchKeywordException(NoSuchKeywordException e) {
+		return ResponseEntity.status(e.getStatus())
+				.body(Response.error(new ErrorResponse(e.getStatus(), e.getStatus().value(), e.getMessage())));
+	}
+
 }
