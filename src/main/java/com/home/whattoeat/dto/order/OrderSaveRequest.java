@@ -1,16 +1,16 @@
 package com.home.whattoeat.dto.order;
 
+import java.time.LocalDateTime;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderSaveRequest {
 
-	private String restaurantName;
-	private String menuName;
-	private int quantity;
+	private String orderNotes;
 
 }

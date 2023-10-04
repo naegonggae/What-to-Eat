@@ -1,16 +1,20 @@
 package com.home.whattoeat.controller;
 
 import com.home.whattoeat.config.auth.PrincipalDetails;
+import com.home.whattoeat.domain.Order;
+import com.home.whattoeat.domain.OrderMenu;
 import com.home.whattoeat.dto.Response;
 import com.home.whattoeat.dto.order.OrderFindResponse;
 import com.home.whattoeat.dto.order.OrderSaveRequest;
 import com.home.whattoeat.dto.order.OrderSaveResponse;
 import com.home.whattoeat.service.OrderService;
 import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,9 +31,18 @@ public class OrderRestController {
 
 	private final OrderService orderService;
 
+	@GetMapping("/listTest31")
+	public ResponseEntity<Response<Page<OrderFindResponse>>> ordersListV31(
+			@AuthenticationPrincipal PrincipalDetails details, Pageable pageable) {
+		Page<OrderFindResponse> result = orderService.findAllListTest31(pageable, details.getMember());
+		return ResponseEntity.ok().body(Response.success(result));
+	}
+
 	@PostMapping
-	public ResponseEntity<Response<OrderSaveResponse>> order(@AuthenticationPrincipal PrincipalDetails details) {
-		OrderSaveResponse result = orderService.order(details.getMember());
+	public ResponseEntity<Response<OrderSaveResponse>> order(@RequestBody OrderSaveRequest request,
+			Authentication authentication) {
+//		@AuthenticationPrincipal PrincipalDetails details
+		OrderSaveResponse result = orderService.order(request, authentication.getName());
 		return ResponseEntity.created(URI.create("/api/v1/orders"+result.getId()))
 				.body(Response.success(result));
 	}

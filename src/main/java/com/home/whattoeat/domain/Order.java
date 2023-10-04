@@ -1,5 +1,8 @@
 package com.home.whattoeat.domain;
 
+import static lombok.AccessLevel.PROTECTED;
+
+import com.home.whattoeat.dto.order.OrderSaveRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,119 +14,96 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity @Builder
+@Entity
 @Table(name = "orders")
-@Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@Getter
+@AllArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 public class Order extends BaseEntity {
 
 	@Id @GeneratedValue
 	@Column(name = "order_id")
 	private Long id;
+	private String orderNotes;
+	private Integer totalAmount;
+	private LocalDateTime orderDate;
+
+	@Enumerated(EnumType.STRING)
+	private OrderStatus status; // ORDER, CANCEL
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id") // Order DB에 생성될 member_id 와 연결
+	@JoinColumn(name = "member_id")
 	private Member member;
-//	@Column(name = "restaurant_id")
-//	private Restaurant restaurant;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "restaurant_id")
+	private Restaurant restaurant;
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderMenu> orderMenuList = new ArrayList<>();
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "cart_id")
-	private Cart cart;
-
-	private String orderTime;
-	private int totalAmount;
-
-	// 배달할 주소 적어야함
-	@Enumerated(EnumType.STRING)
-	private OrderStatus orderStatus; // ORDER, CANCEL
-
-	private LocalDateTime orderDate; // 주문시간
-
-	// 배달주소
-	// 주문상태
-	// 배달원
-	// 결제정보
-	// 주문 특이사항
-	// 배달 요청시간
-
-	// 연관관계 메서드
+	// 연관관계 메서드 //
 	public void addMember(Member member) {
-		this.member = member; // Order (여기에 있는 클래스) 에 member 를 파라미터에 받은 member 로 설정해준다.
-		member.getOrderList().add(this); // 파라미터로 받은 member 에 있는 orderList 에 여기 this = Order 을 업데이트 시킨다.
+		this.member = member;
+		member.getOrderList().add(this);
 	}
 	public void addOrderDetail(OrderMenu orderMenu) {
-		this.orderMenuList.add(orderMenu); // 여기 orderMenuList 에 orderMenu 채워줘
-		orderMenu.addOrder(this); // orderMenu 에 있는 order this = 요 클래스로 채워줘
+		this.orderMenuList.add(orderMenu);
+		orderMenu.addOrder(this);
 	}
 
-
-	// 주문 생성
-	public static Order createOrder(Member member, Cart cart) { // ... 으로 list 넘김
-
-//		order.makeOrder(member, cart);
-		List<OrderMenu> copiedOrderMenu = copyCartMenuToOrderMenu(cart);
-
-
-		return new Order(member, copiedOrderMenu);
+	// 생성 메서드 //
+	public static Order createOrder(OrderSaveRequest request, Member member, Cart cart) {
+		return new Order(request, member, cart);
 	}
-
+	public Order(OrderSaveRequest request, Member member, Cart cart) {
+		this.orderNotes = request.getOrderNotes();
+		this.totalAmount = getTotalAmount();
+		this.status = OrderStatus.ORDER;
+		this.orderDate = LocalDateTime.now();
+		addMember(member);
+		this.restaurant = cart.getCartMenus().get(0).getMenu().getRestaurant();
+		this.restaurant.increaseOrderCount(); // 확인 필요
+		copyCartMenuToOrderMenu(cart).stream()
+				.forEach(oderMenu -> this.addOrderDetail(oderMenu));
+	}
+	// CartMenu -> OrderMenu 로 복사
 	private static List<OrderMenu> copyCartMenuToOrderMenu(Cart cart) {
 		List<OrderMenu> copiedOrderMenu = new ArrayList<>();
 		for (CartMenu cartMenu : cart.getCartMenus()) {
-			OrderMenu orderMenu =
-					new OrderMenu(cartMenu.getMenu(), cartMenu.getQuantity(), cartMenu.getPrice());
-			copiedOrderMenu.add(orderMenu);
+			copiedOrderMenu.add(OrderMenu.createMenu(cartMenu));
 		}
 		return copiedOrderMenu;
 	}
 
-//	public void makeOrder(Member member, Cart cart) {
-//		this.member = member;
-//		for (CartMenu cartMenu : cart.getCartMenus()) {
-//			this.orderMenuList.add(cartMenu);
-//		}
-//		this.orderStatus = OrderStatus.ORDER;
-//		this.orderDate = LocalDateTime.now();
-//	}
-
-	public Order(Member member, List<OrderMenu> orderMenuList) {
-		this.member = member;
-		this.orderMenuList = orderMenuList;
-		this.totalAmount = getTotalPrice();
-		this.orderStatus = OrderStatus.ORDER;
-		this.orderDate = LocalDateTime.now();
-	}
-
+	// 비즈니스 메서드 //
 	// 주문 취소
 	public void orderCancel() {
-		System.out.println("주문취소 로직에 도착했습니다.");
-
-		this.orderStatus = OrderStatus.CANCEL;
-		for (OrderMenu orderMenu : orderMenuList) {
-			orderMenu.cancel();
-		}
+		this.status = OrderStatus.CANCEL;
 	}
 
 	// 전체 주문 가격 조회
-	public int getTotalPrice() {
-		int totalPrice = 0;
+	public Integer getTotalAmount() {
+		Integer totalPrice = 0;
 		for (OrderMenu orderMenu : orderMenuList) {
 			totalPrice += orderMenu.getTotalPrice();
 		}
 		return totalPrice;
 	}
 
+	@Override
+	public String toString() {
+		return "Order{" +
+				"id=" + id +
+				", orderNotes='" + orderNotes + '\'' +
+				", totalAmount=" + totalAmount +
+				", orderDate=" + orderDate +
+				", status=" + status +
+				'}';
+	}
 }
