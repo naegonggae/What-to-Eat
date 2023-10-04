@@ -31,13 +31,6 @@ public class OrderRestController {
 
 	private final OrderService orderService;
 
-	@GetMapping("/listTest31")
-	public ResponseEntity<Response<Page<OrderFindResponse>>> ordersListV31(
-			@AuthenticationPrincipal PrincipalDetails details, Pageable pageable) {
-		Page<OrderFindResponse> result = orderService.findAllListTest31(pageable, details.getMember());
-		return ResponseEntity.ok().body(Response.success(result));
-	}
-
 	@PostMapping
 	public ResponseEntity<Response<OrderSaveResponse>> order(@RequestBody OrderSaveRequest request,
 			Authentication authentication) {
@@ -56,8 +49,15 @@ public class OrderRestController {
 
 	@GetMapping
 	public ResponseEntity<Response<Page<OrderFindResponse>>> findAllMyOrder(
+			@AuthenticationPrincipal PrincipalDetails details, Pageable pageable) {
+		Page<OrderFindResponse> result = orderService.findAllMyOrder(pageable, details.getMember());
+		return ResponseEntity.ok().body(Response.success(result));
+	}
+
+	@GetMapping("/listTest31")
+	public ResponseEntity<Response<Page<OrderFindResponse>>> findAllMyOrder2(
 			@AuthenticationPrincipal PrincipalDetails details) {
-		Page<OrderFindResponse> result = orderService.findAllMyOrder(details.getMember());
+		Page<OrderFindResponse> result = orderService.findAllMyList(details.getMember());
 		return ResponseEntity.ok().body(Response.success(result));
 	}
 

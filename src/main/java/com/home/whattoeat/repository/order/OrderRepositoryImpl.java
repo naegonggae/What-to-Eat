@@ -14,7 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-// 클래스 이름은 무조건 RestaurantRepository + Impl 해야함 -> 규칙임
+// 클래스 이름은 무조건 OrderRepository + Impl 해야함 -> 규칙임
 public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
@@ -23,6 +23,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 		this.queryFactory = new JPAQueryFactory(em);
 	}
 
+	// 내 주문리스트 전체 조회
 	@Override
 	public Page<Order> findAllOrder(String username, Pageable pageable) {
 
@@ -33,6 +34,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 				.join(order.member, member).fetchJoin()
 				.join(order.restaurant, restaurant).fetchJoin()
 				.where(member.username.eq(username))
+				.orderBy(order.createdAt.desc())
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.fetch();
