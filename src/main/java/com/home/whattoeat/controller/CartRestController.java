@@ -32,10 +32,8 @@ public class CartRestController {
 	}
 
 	@DeleteMapping("/{cartId}")
-	public ResponseEntity<Response<Void>> addCart(@PathVariable Long cartId,
-			@AuthenticationPrincipal PrincipalDetails details) {
+	public ResponseEntity<Response<Void>> clearCart(@PathVariable Long cartId) {
 		cartService.clearCart(cartId);
-//		cartService.clearCart2(cartId);
 		return ResponseEntity.noContent().build();
 	}
 

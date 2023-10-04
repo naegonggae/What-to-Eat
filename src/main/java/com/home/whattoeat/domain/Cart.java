@@ -1,6 +1,8 @@
 package com.home.whattoeat.domain;
 
-import com.home.whattoeat.dto.cart.CartSaveRequest;
+import static lombok.AccessLevel.PROTECTED;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,44 +14,34 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@AllArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 public class Cart extends BaseEntity {
 
 	@Id @GeneratedValue
 	@Column(name = "cart_id")
 	private Long id;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "cart", cascade = CascadeType.REMOVE)
 	private List<CartMenu> cartMenus = new ArrayList<>();
-
-//	@OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
-//	private Order order;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	private int totalPrice;
-
-
+	// 생성 메서드 //
 	public static Cart createCart(Member member) {
-		return new Cart(member, 0);
+		return new Cart(member);
 	}
-	public Cart(Member member, int totalPrice) {
+	public Cart(Member member) {
 		this.member = member;
-		this.totalPrice = totalPrice;
 	}
 
-	public void addCartMenuInMyCart(CartMenu cartMenu) {
-
-	}
-
-	public void clearCart() {
-		cartMenus.clear();
-	}
 }
