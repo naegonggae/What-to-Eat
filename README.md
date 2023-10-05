@@ -1,4 +1,5 @@
-# 🍔 뭐먹
+<img width="843" alt="스크린샷 2023-10-06 오전 1 39 24" src="https://github.com/naegonggae/daengnyang-daily/assets/99169063/d868265a-a89d-4b26-bf42-df5c88ae4a04">
+
 
 <br>
 
