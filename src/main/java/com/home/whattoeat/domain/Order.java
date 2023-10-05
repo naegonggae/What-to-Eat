@@ -47,6 +47,8 @@ public class Order extends BaseEntity {
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderMenu> orderMenuList = new ArrayList<>();
 
+	private String restaurantName;
+
 	// 연관관계 메서드 //
 	public void addMember(Member member) {
 		this.member = member;
@@ -96,8 +98,9 @@ public class Order extends BaseEntity {
 		return totalPrice;
 	}
 
-	public void removeRestaurant() {
+	public void removeRestaurant(Restaurant restaurant) {
 		this.restaurant = null;
+		this.restaurantName = restaurant.getName();
 	}
 
 	@Override

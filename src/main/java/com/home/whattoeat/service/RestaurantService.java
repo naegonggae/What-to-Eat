@@ -113,7 +113,7 @@ public class RestaurantService {
 
 		// 주문에 있는 식당을 null 로 변환
 		List<Order> orderList = orderRepository.findAllByRestaurant(restaurant);
-		orderList.stream().forEach(order -> order.removeRestaurant());
+		orderList.stream().forEach(order -> order.removeRestaurant(restaurant));
 
 		restaurantRepository.deleteById(id);
 	}

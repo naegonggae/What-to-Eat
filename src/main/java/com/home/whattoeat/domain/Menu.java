@@ -28,7 +28,6 @@ public class Menu extends BaseEntity {
 	private String name;
 	private String description;
 	private Integer price;
-	private String restaurantName; // 식당을 삭제했을때 식당이름을 조회할수있도록
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "restaurant_id")
@@ -49,7 +48,6 @@ public class Menu extends BaseEntity {
 		this.description = request.getDescription();
 		this.price = request.getPrice();
 		this.addRestaurant(restaurant);
-		this.restaurantName = restaurant.getName(); // 식당을 삭제했을때 식당이름을 조회할수있도록
 	}
 
 	// 비즈니스 메서드 //

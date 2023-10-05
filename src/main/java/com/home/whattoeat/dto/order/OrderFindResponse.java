@@ -29,6 +29,7 @@ public class OrderFindResponse {
 		return new OrderFindResponse(
 				order.getId(),
 				order.getRestaurant().getName(), // 레스토랑 강제 초기화
+//				order.getRestaurantName(), // 삭제되었을때는 이걸 쓰면 됨
 				order.getTotalAmount(),
 				orderMenuMap,
 				order.getOrderNotes(),
