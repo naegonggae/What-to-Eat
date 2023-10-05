@@ -1,10 +1,10 @@
 # 뭐먹
 
 ### 서비스 소개
-뭐먹 서비스는 단체를 타겟으로 음식을 주문할 수 있는 서비스입니다. 뭐먹을 통해서 공동체 사람들과 다양한 음식들을 맛보세요! 
+뭐먹 서비스는 단체 모임 및 공동체 활동을 위한 음식을 주문하는 데 도움을 주는 플랫폼입니다. 뭐먹을 통해 간편하게 다양한 음식을 즐기며, 공동체 구성원들과 함께하는 모임을 더욱 특별하게 만들어보세요!
 
 ### API 명세서
-![PostMan API documentation](https://documenter.getpostman.com/view/25393488/2s9YJexLKn)
+[PostMan API Documentation](https://documenter.getpostman.com/view/25393488/2s9YJexLKn)
 
 ### ERD 엔티티 설계도
 ### 테이블 설계도
