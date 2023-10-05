@@ -80,12 +80,7 @@ public class MemberService {
 
 	}
 
-	// 이용 x - 모든 회원 조회
-	public Page<MemberFindResponse> findAll(Pageable pageable) {
-		return memberRepository.findAll(pageable).map(MemberFindResponse::from);
-	}
-
-	// 이용 x - 단건 조회
+	// 단건 조회
 	public MemberFindResponse findOne(Long id) {
 		Member findMember = memberRepository.findById(id)
 				.orElseThrow(NoSuchMemberException::new);

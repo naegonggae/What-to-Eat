@@ -61,17 +61,10 @@ public class MemberRestController {
 		return ResponseEntity.ok().body(Response.success(MemberLoginResponse.from()));
 	}
 
-	// 이용 x - 회원 단건 조회
+	// 회원 단건 조회
 	@GetMapping("/members/{id}")
 	public ResponseEntity<Response<MemberFindResponse>> findOne(@PathVariable Long id) {
 		MemberFindResponse result = memberService.findOne(id);
-		return ResponseEntity.ok().body(Response.success(result));
-	}
-
-	// 이용 x - 전체 회원 조회
-	@GetMapping("/members")
-	public ResponseEntity<Response<Page<MemberFindResponse>>> findAll(Pageable pageable) {
-		Page<MemberFindResponse> result = memberService.findAll(pageable);
 		return ResponseEntity.ok().body(Response.success(result));
 	}
 
