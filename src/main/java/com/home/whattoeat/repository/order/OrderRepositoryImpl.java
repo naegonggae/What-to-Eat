@@ -11,6 +11,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
@@ -28,6 +29,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 	public Page<Order> findAllOrder(String username, Pageable pageable) {
 
 		if (username.isEmpty()) throw new NoSuchMemberException();
+
+		pageable = PageRequest.of(0, 3);
 
 		List<Order> content = queryFactory
 				.selectFrom(order)

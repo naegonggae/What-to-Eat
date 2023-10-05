@@ -17,6 +17,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
@@ -34,6 +35,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 		// condition 이 null 이면 전체를 끌어오니 null 처리 필요
 		if (condition.getCategoryName().isEmpty()) throw new NoSuchKeywordException();
 
+		pageable = PageRequest.of(0, 8);
 		List<Restaurant> content = queryFactory
 				.selectDistinct(restaurant)
 				.from(restaurant)
@@ -61,6 +63,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 				condition.getStarRating() == null && condition.getMinOrderAmount()==null &&
 				condition.getMaxOrderAmount()==null) throw new NoSuchKeywordException();
 
+		pageable = PageRequest.of(0, 8);
 		List<Restaurant> content = queryFactory
 				.selectDistinct(restaurant)
 				.from(restaurant)
@@ -110,6 +113,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
 			Pageable pageable) {
 
 		if(condition.getKeyword().isEmpty()) throw new NoSuchKeywordException();
+		pageable = PageRequest.of(0, 8);
 
 		List<Restaurant> content = queryFactory
 				.selectDistinct(restaurant)

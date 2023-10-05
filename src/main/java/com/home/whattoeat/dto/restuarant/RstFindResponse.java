@@ -30,7 +30,7 @@ public class RstFindResponse {
 				restaurant.getPhoneNumber(),
 				restaurant.getDescription(),
 				restaurant.getAddress(),
-				restaurant.getStarRating(),
+				Math.round(restaurant.getStarRating()*10.0) / 10.0,
 				restaurant.getNumberOfOrders(),
 				restaurant.getMinOrderAmount(),
 				restaurant.getMaxOrderAmount(),
