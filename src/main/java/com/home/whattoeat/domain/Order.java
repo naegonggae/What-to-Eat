@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "orders")
 @Getter
-@AllArgsConstructor(access = PROTECTED)
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 public class Order extends BaseEntity {
 
@@ -96,6 +96,10 @@ public class Order extends BaseEntity {
 		return totalPrice;
 	}
 
+	public void removeRestaurant() {
+		this.restaurant = null;
+	}
+
 	@Override
 	public String toString() {
 		return "Order{" +
@@ -106,4 +110,5 @@ public class Order extends BaseEntity {
 				", status=" + status +
 				'}';
 	}
+
 }

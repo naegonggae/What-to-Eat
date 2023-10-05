@@ -51,7 +51,7 @@ public class Restaurant extends BaseEntity {
 	private Member member;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE) // 식당을 삭제하면 메뉴도 삭제
+	@OneToMany(mappedBy = "restaurant") // 식당을 삭제하면 메뉴도 삭제
 	private List<Menu> menuList = new ArrayList<>();
 
 	@JsonIgnore
@@ -147,5 +147,24 @@ public class Restaurant extends BaseEntity {
 	// 주문시 식당의 주문수가 하나씩 오름
 	public void increaseOrderCount() {
 		this.numberOfOrders++;
+	}
+
+	// 데이터 용 생성자
+	public Restaurant(Long id, String name, String phoneNumber, String description, Address address,
+			Double starRating, Long numberOfOrders, Integer minOrderAmount, Integer maxOrderAmount,
+			Integer reviewCount, RestaurantStatus status,
+			List<RestaurantCategory> restaurantCategoryList) {
+		this.id = id;
+		this.name = name;
+		this.phoneNumber = phoneNumber;
+		this.description = description;
+		this.address = address;
+		this.starRating = starRating;
+		this.numberOfOrders = numberOfOrders;
+		this.minOrderAmount = minOrderAmount;
+		this.maxOrderAmount = maxOrderAmount;
+		this.reviewCount = reviewCount;
+		this.status = status;
+		this.restaurantCategoryList = restaurantCategoryList;
 	}
 }

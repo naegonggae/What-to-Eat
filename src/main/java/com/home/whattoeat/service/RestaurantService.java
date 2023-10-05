@@ -2,6 +2,8 @@ package com.home.whattoeat.service;
 
 import com.home.whattoeat.domain.Category;
 import com.home.whattoeat.domain.Member;
+import com.home.whattoeat.domain.Menu;
+import com.home.whattoeat.domain.Order;
 import com.home.whattoeat.domain.Restaurant;
 import com.home.whattoeat.domain.RestaurantCategory;
 import com.home.whattoeat.dto.restuarant.RstCategoryCondition;
@@ -16,6 +18,8 @@ import com.home.whattoeat.exception.member.AccessDeniedException;
 import com.home.whattoeat.exception.reataurant.DuplicateRestaurantException;
 import com.home.whattoeat.exception.reataurant.NoSuchRestaurantException;
 import com.home.whattoeat.repository.CategoryRepository;
+import com.home.whattoeat.repository.MenuRepository;
+import com.home.whattoeat.repository.order.OrderRepository;
 import com.home.whattoeat.repository.restaurant.RestaurantRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +36,8 @@ public class RestaurantService {
 
 	private final CategoryRepository categoryRepository;
 	private final RestaurantRepository restaurantRepository;
+	private final MenuRepository menuRepository;
+	private final OrderRepository orderRepository;
 
 	// 식당 등록
 	@Transactional
@@ -97,9 +103,17 @@ public class RestaurantService {
 	@Transactional
 	public void delete(Long id, String username) {
 		// 로그인한 유저정보 == 레스토랑 등록한 사람일 경우만 삭제 가능
-		hasPermission(id, username);
+		Restaurant restaurant = hasPermission(id, username);
 
 		// 주문은 현재 생성시점에서 완료된걸로 취급하기 때문에 진행중인 주문은 없다.
+
+		// 메뉴에 있는 식당을 null 로 변환
+		List<Menu> menuList = menuRepository.findAllByRestaurant(restaurant);
+		menuList.stream().forEach(menu -> menu.removeRestaurant());
+
+		// 주문에 있는 식당을 null 로 변환
+		List<Order> orderList = orderRepository.findAllByRestaurant(restaurant);
+		orderList.stream().forEach(order -> order.removeRestaurant());
 
 		restaurantRepository.deleteById(id);
 	}
