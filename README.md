@@ -14,8 +14,8 @@
 
 <br>
  
-## ✅ 뭐먹의 핵심서비스 소개
-노션링크
+## ✅ 뭐먹의 자세한 기록
+[👉🏻 뭐먹 서비스 기록 보러가기](https://concrete-puck-b1a.notion.site/Welcome-to-884c4c1e8f1c4e46a334dc66c7ebb1e2?pvs=4)
 
 <br>
 
