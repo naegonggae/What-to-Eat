@@ -1,15 +1,12 @@
 package com.home.whattoeat.controller;
 
 import com.home.whattoeat.config.auth.PrincipalDetails;
-import com.home.whattoeat.domain.Order;
-import com.home.whattoeat.domain.OrderMenu;
 import com.home.whattoeat.dto.Response;
 import com.home.whattoeat.dto.order.OrderFindResponse;
 import com.home.whattoeat.dto.order.OrderSaveRequest;
 import com.home.whattoeat.dto.order.OrderSaveResponse;
 import com.home.whattoeat.service.OrderService;
 import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,13 +48,6 @@ public class OrderRestController {
 	public ResponseEntity<Response<Page<OrderFindResponse>>> findAllMyOrder(
 			@AuthenticationPrincipal PrincipalDetails details, Pageable pageable) {
 		Page<OrderFindResponse> result = orderService.findAllMyOrder(pageable, details.getMember());
-		return ResponseEntity.ok().body(Response.success(result));
-	}
-
-	@GetMapping("/listTest31")
-	public ResponseEntity<Response<Page<OrderFindResponse>>> findAllMyOrder2(
-			@AuthenticationPrincipal PrincipalDetails details) {
-		Page<OrderFindResponse> result = orderService.findAllMyList(details.getMember());
 		return ResponseEntity.ok().body(Response.success(result));
 	}
 

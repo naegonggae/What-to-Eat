@@ -62,19 +62,8 @@ public class OrderService {
 //		orderRepository.deleteById(orderId);
 	}
 
-
-	// 내가 한 주문 조회 - 최신순서로 정렬해야함 효율 안좋은거
-	public Page<OrderFindResponse> findAllMyList(Member member) {
-		// 생성 시간을 기준으로 내림차순으로 정렬하도록 Pageable 객체 생성
-		// 0번페이지부터 시작해서 한페이지에 20개씩 들어감
-		Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-		return orderRepository.findAllByMember(member, pageable).map(OrderFindResponse::from);
-	}
-
-	// 내가 한 주문 조회 - 최신순서로 정렬해야함 효율 좋은거
+	// 내가 한 주문 조회
 	public Page<OrderFindResponse> findAllMyOrder(Pageable pageable, Member member) {
-		// 여기 필드에서 지연로딩이 강제 초기화 되어야함
 		return orderRepository.findAllOrder(member.getUsername(), pageable).map(OrderFindResponse::from);
 	}
 
