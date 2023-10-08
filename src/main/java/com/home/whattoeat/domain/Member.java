@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor(access = PROTECTED)
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 public class Member extends BaseEntity {
 
@@ -74,4 +74,15 @@ public class Member extends BaseEntity {
 				", role=" + role +
 				'}';
 	}
+
+	// 테스트
+	public Member(Long id, MemberSaveRequest request, String encodedPassword) {
+		this.id = id;
+		this.username = request.getUsername();
+		this.email = request.getEmail();
+		this.password = encodedPassword;
+		this.phoneNumber = request.getPhoneNumber();
+		this.role = MemberRole.USER;
+	}
+
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class MemberSaveRequest {
 
 	@NotEmpty(message = "회원 이름은 필수 입니다.")

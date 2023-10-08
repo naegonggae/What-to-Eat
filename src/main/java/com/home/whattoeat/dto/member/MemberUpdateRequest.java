@@ -1,20 +1,15 @@
 package com.home.whattoeat.dto.member;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class MemberUpdateRequest {
 
 	private String username;
 	private String email;
 	private String phoneNumber;
-
-
-
-
 }
