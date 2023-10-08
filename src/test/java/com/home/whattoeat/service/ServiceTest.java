@@ -1,7 +1,9 @@
 package com.home.whattoeat.service;
 
+import com.home.whattoeat.domain.Category;
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.MemberRole;
+import com.home.whattoeat.repository.CategoryRepository;
 import com.home.whattoeat.repository.CommentRepository;
 import com.home.whattoeat.repository.MemberRepository;
 import com.home.whattoeat.repository.ReplyRepository;
@@ -20,6 +22,8 @@ public class ServiceTest {
 	@Mock
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 	@Mock
+	CategoryRepository categoryRepository;
+	@Mock
 	RestaurantRepository restaurantRepository;
 	@Mock
 	ReviewRepository reviewRepository;
@@ -31,5 +35,6 @@ public class ServiceTest {
 	public Member member = new Member(
 			1L, "홍길동", "naver@naver.com", "1234",
 			"010-1234-1234", MemberRole.USER, null);
+	public Category category = new Category(1L, "햄버거");
 
 }
