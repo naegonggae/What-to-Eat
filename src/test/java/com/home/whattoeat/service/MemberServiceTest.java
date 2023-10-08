@@ -2,207 +2,244 @@ package com.home.whattoeat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.home.whattoeat.domain.MemberRole;
+import com.home.whattoeat.dto.member.MemberFindResponse;
 import com.home.whattoeat.dto.member.MemberSaveRequest;
 import com.home.whattoeat.dto.member.MemberSaveResponse;
 import com.home.whattoeat.dto.member.MemberUpdateRequest;
 import com.home.whattoeat.domain.Member;
+import com.home.whattoeat.exception.member.ConstraintViolationMemberException;
 import com.home.whattoeat.exception.member.DuplicateEmailException;
 import com.home.whattoeat.exception.member.DuplicateUsernameException;
-import com.home.whattoeat.repository.MemberRepository;
+import com.home.whattoeat.exception.member.NoSuchMemberException;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-@ExtendWith(MockitoExtension.class)
-class MemberServiceTest {
-
-	@Mock
-	MemberRepository memberRepository;
-
-	@Mock
-	BCryptPasswordEncoder bCryptPasswordEncoder;
+class MemberServiceTest extends ServiceTest {
 
 	@InjectMocks // mock 들을 의존성 주입해줌
 	private MemberService memberService;
 
-
-	//member service 에서 테스트해야할것은 회원인 잘 저장됐는지가 아니다.
-	@Test
-	@DisplayName("회원 저장 성공")
-	public void saveMember() throws Exception {
-
-		// 실제 테스트할 메서드에 들어갈 파라미터
-		MemberSaveRequest memberSaveRequest =
-				new MemberSaveRequest("홍길동", "email@naver.com", "1234");
-
-
-		// 환경설정
-		Member savedMember = Member.builder()
-				.id(1L)
-				.username(memberSaveRequest.getUsername())
-				.email(memberSaveRequest.getEmail())
-				.password(bCryptPasswordEncoder.encode(memberSaveRequest.getPassword()))
-				.build();
-
-		when(memberRepository.save(any(Member.class))).thenReturn(savedMember);
-
-		// 환경설정한대로면 이렇게 나와야한다.
-		MemberSaveResponse memberSaveResponse = MemberSaveResponse.form(savedMember);
-
-
-		// 서비스 메서드로 만든거랑 mock 하면서 만든거랑 같다
-		// 실제 메서드를 실행하기까지 위의 환경들이 다 적용받는다. -> 환경설정한거보다 테스트할 메서드의 실행이 위에 있다면 null 이 뜰수도있다.
-		assertThat(memberService.saveMember(memberSaveRequest))
-				.usingRecursiveComparison().isEqualTo(memberSaveResponse);
+	@BeforeEach
+	void setUp() {
+		member = new Member(
+				1L, "홍길동", "naver@naver.com", "1234",
+				"010-1234-1234", MemberRole.USER, null);
 	}
 
-	@Test
-	@DisplayName("회원저장 실패 - 중복된 이름")
-	public void saveFail1() throws Exception {
-		MemberSaveRequest memberSaveRequest =
-				new MemberSaveRequest("홍길동", "email@naver.com", "1234");
+	@Nested
+	@DisplayName("saveMember 메서드는")
+	class SaveMemberCase {
 
-		given(memberRepository.existsByUsername("홍길동")).willReturn(true);
+		// given
+		MemberSaveRequest request = new MemberSaveRequest(
+				"홍길동", "nave@naver.com","1234","010-1234-1234");
+		@Test
+		@DisplayName("이메일과 아이디가 중복되지 않으면 member 를 생성")
+		public void success_saveMember() {
 
-		assertThatThrownBy(() -> memberService.saveMember(memberSaveRequest))
-				.isInstanceOf(DuplicateUsernameException.class);
+			// when
+			when(memberRepository.existsByEmail(request.getEmail())).thenReturn(false);
+			when(memberRepository.existsByUsername(request.getUsername())).thenReturn(false);
+			when(bCryptPasswordEncoder.encode(request.getPassword())).thenReturn("암호화된 비밀번호");
+			Member member = new Member(1L, request, "암호화된 비밀번호");
+			when(memberRepository.save(any(Member.class))).thenReturn(member);
+
+			// then
+			MemberSaveResponse result = memberService.saveMember(request);
+
+			assertThat(result.getId()).isEqualTo(1L);
+			assertThat(result.getUsername()).isEqualTo("홍길동");
+			assertThat(result.getEmail()).isEqualTo("nave@naver.com");
+			assertThat(result.getPhoneNumber()).isEqualTo("010-1234-1234");
+		}
+
+		@Test
+		@DisplayName("아이디가 중복되면 member 생성 실패")
+		public void fail1_saveMember() {
+
+			// when
+			when(memberRepository.existsByUsername(anyString())).thenReturn(true);
+
+			// then
+			assertThatThrownBy(() -> memberService.saveMember(request))
+					.isInstanceOf(DuplicateUsernameException.class)
+					.hasMessage("이미 존재하는 아이디입니다.");
+		}
+
+		@Test
+		@DisplayName("이메일이 중복되면 member 생성 실패")
+		public void fail2_saveMember() {
+
+			// when
+			when(memberRepository.existsByEmail(anyString())).thenReturn(true);
+
+			// then
+			assertThatThrownBy(() -> memberService.saveMember(request))
+					.isInstanceOf(DuplicateEmailException.class)
+					.hasMessage("이미 사용중인 이메일입니다.");
+		}
 	}
 
-	@Test
-	@DisplayName("회원저장 실패 - 중복된 이메일")
-	public void saveFail2() throws Exception {
-		// 실패 테스트는 환경을 설정하고 테스트할 메서드를 실행하면 특정에러가 나와야한다.
-		// 테스트할 메서드에 들어갈 파라미터
-		MemberSaveRequest memberSaveRequest =
-				new MemberSaveRequest("홍길동", "email@naver.com", "1234");
+	@Nested
+	@DisplayName("findOne 메서드는")
+	class FindOneCase {
 
-		// 테스트 환경 설정
-		given(memberRepository.existsByEmail("email@naver.com")).willReturn(true);
+		@Test
+		@DisplayName("member 단건 조회 성공")
+		public void success_findOne() {
 
-		// 테스트할 메서드 실행
-		// 환경설정한 결과 도출한 것과 비교
-		assertThatThrownBy(() -> memberService.saveMember(memberSaveRequest))
-				.isInstanceOf(DuplicateEmailException.class);
+			// when
+			when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+
+			// then
+			MemberFindResponse result = memberService.findOne(1L);
+
+			assertThat(result.getId()).isEqualTo(1L);
+			assertThat(result.getUsername()).isEqualTo("홍길동");
+			assertThat(result.getEmail()).isEqualTo("naver@naver.com");
+			assertThat(result.getPhoneNumber()).isEqualTo("010-1234-1234");
+		}
+
+		@Test
+		@DisplayName("존재하지 않는 id 를 조회할때 member 단건 조회 실패")
+		public void fail1_findOne() {
+
+			// when
+			when(memberRepository.findById(-1L)).thenThrow(NoSuchMemberException.class);
+
+			// then
+			assertThatThrownBy(() -> memberService.findOne(-1L))
+					.isInstanceOf(NoSuchMemberException.class)
+					.hasMessage("존재하지 않는 회원입니다.");
+		}
 	}
 
-	@Test
-	@DisplayName("회원 단건 조회 성공")
-	public void findOne() throws Exception {
+	@Nested
+	@DisplayName("update 메서드는")
+	class UpdateCase {
 
-		Member savedMember = Member.builder()
-				.id(1L)
-				.username("홍길동")
-				.email("email@naver.com")
-				.password("1234")
-				.build();
+		// given
+		MemberUpdateRequest request = new MemberUpdateRequest(
+				"유재석", "gmail@naver.com","010-9999-1234");
+		@Test
+		@DisplayName("member 수정 성공")
+		public void success_update() {
 
-		given(memberRepository.findById(1L)).willReturn(Optional.of(savedMember));
+			// when
+			when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+			when(memberRepository.existsByUsername(anyString())).thenReturn(false);
+			when(memberRepository.existsByEmail(anyString())).thenReturn(false);
 
-		assertThat(memberService.findOne(1L).getId()).isEqualTo(savedMember.getId());
-		assertThat(memberService.findOne(1L).getUsername()).isEqualTo(savedMember.getUsername());
-		assertThat(memberService.findOne(1L).getEmail()).isEqualTo(savedMember.getEmail());
-		assertThat(memberService.findOne(1L).getPassword()).isEqualTo(savedMember.getPassword());
+			// then
+			memberService.update(1L, request);
+			MemberFindResponse result = memberService.findOne(1L);
+
+			assertThat(result.getUsername()).isEqualTo("유재석");
+			assertThat(result.getEmail()).isEqualTo("gmail@naver.com");
+			assertThat(result.getPhoneNumber()).isEqualTo("010-9999-1234");
+		}
+
+		@Test
+		@DisplayName("존재하지 않은 id 를 조회했을때 수정 실패")
+		public void fail1_update() {
+
+			// when
+			when(memberRepository.findById(-1L)).thenThrow(NoSuchMemberException.class);
+
+			// then
+			assertThatThrownBy(() -> memberService.update(-1L, request))
+					.isInstanceOf(NoSuchMemberException.class)
+					.hasMessage("존재하지 않는 회원입니다.");
+		}
+
+		@Test
+		@DisplayName("변경한 아이디가 중복된 아이디일때 수정 실패")
+		public void fail2_update() {
+
+			// when
+			when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+			when(memberRepository.existsByUsername(anyString())).thenReturn(true);
+
+			// then
+			assertThatThrownBy(() -> memberService.update(1L, request))
+					.isInstanceOf(DuplicateUsernameException.class)
+					.hasMessage("이미 존재하는 아이디입니다.");
+		}
+
+		@Test
+		@DisplayName("변경한 이메일이 중복된 이메일일때 수정 실패")
+		public void fail3_update() {
+
+			// when
+			when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+			when(memberRepository.existsByEmail(anyString())).thenReturn(true);
+
+			// then
+			assertThatThrownBy(() -> memberService.update(1L, request))
+					.isInstanceOf(DuplicateEmailException.class)
+					.hasMessage("이미 사용중인 이메일입니다.");
+		}
 	}
 
-	@Test
-	@DisplayName("회원 수정 성공")
-	public void update() throws Exception {
-		// 테스트할 메서드에 들어갈 파라미터
-		MemberUpdateRequest memberUpdateRequest =
-				new MemberUpdateRequest("강호동", "email@google.com");
-		// 환경설정
-		Member savedMember = Member.builder()
-				.id(1L)
-				.username("홍길동")
-				.email("email@naver.com")
-				.password("1234")
-				.build();
-		given(memberRepository.findById(1L)).willReturn(Optional.of(savedMember));
+	@Nested
+	@DisplayName("delete 메서드는")
+	class DeleteCase {
 
-		// 테스트할 메서드 실행
-		memberService.update(1L, memberUpdateRequest);
+		@Test
+		@DisplayName("member 삭제 성공")
+		public void success_delete() {
 
-		// given 으로 저장한거 꺼낼수는 있구나, 결과 확인
-		assertThat(memberRepository.findById(1L).orElseThrow().getUsername()).isEqualTo("강호동");
+			// when
+			when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+			when(restaurantRepository.existsByMember(member)).thenReturn(false);
 
-	}
+			// then
+			memberService.delete(1L);
 
-	@Test
-	@DisplayName("회원 수정시 중복되는 이름을 선택")
-	public void updateFail1() throws Exception {
-		// 테스트할 메서드에 들어갈 파라미터
-		MemberUpdateRequest memberUpdateRequest =
-				new MemberUpdateRequest("이상훈", "email@google.com");
-		// 환경설정
-		Member savedMember = Member.builder()
-				.id(1L)
-				.username("홍길동")
-				.email("email@naver.com")
-				.password("1234")
-				.build();
+			verify(reviewRepository, times(1)).deleteAllByMember(member);
+			verify(commentRepository, times(1)).deleteAllByMember(member);
+			verify(replyRepository, times(1)).deleteAllByMember(member);
+			verify(memberRepository, times(1)).deleteById(1L);
+		}
 
-		given(memberRepository.findById(1L)).willReturn(Optional.of(savedMember));
-//		given(memberRepository.findById(2L)).willReturn(Optional.of(savedMember2));
+		@Test
+		@DisplayName("존재하지 않는 id 를 삭제할때 member 삭제 실패")
+		public void fail1_delete() {
 
-		// 테스트할 메서드 실행
-//		memberService.update(1L, memberUpdateRequest);
+			// when
+			when(memberRepository.findById(1L)).thenThrow(NoSuchMemberException.class);
 
-		given(memberRepository.existsByUsername("이상훈")).willReturn(true);
-		// given 으로 저장한거 꺼낼수는 있구나, 결과 확인
-//		assertThat(memberRepository.findById(1L).orElseThrow().getUsername()).isEqualTo("이상훈");
-		assertThatThrownBy(() -> memberService.update(1L, memberUpdateRequest))
-				.isInstanceOf(DuplicateUsernameException.class);
+			// then
+			assertThatThrownBy(() -> memberService.delete(1L))
+					.isInstanceOf(NoSuchMemberException.class)
+					.hasMessage("존재하지 않는 회원입니다.");
+		}
 
-	}
+		@Test
+		@DisplayName("회원이 식당을 가지고 있을때 member 삭제 실패")
+		public void fail2_delete() {
 
-	@Test
-	@DisplayName("회원 수정시 중복되는 이메일을 선택")
-	public void updateFail2() throws Exception {
-		// 테스트할 메서드에 들어갈 파라미터
-		MemberUpdateRequest memberUpdateRequest =
-				new MemberUpdateRequest("홍길동", "hi@google.com");
-		// 환경설정
-		Member savedMember = Member.builder()
-				.id(1L)
-				.username("홍길동")
-				.email("email@naver.com")
-				.password("1234")
-				.build();
+			// when
+			when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+			when(restaurantRepository.existsByMember(member)).thenReturn(true);
 
-		given(memberRepository.findById(1L)).willReturn(Optional.of(savedMember));
-
-		given(memberRepository.existsByEmail("hi@google.com")).willReturn(true);
-
-		// given 으로 저장한거 꺼낼수는 있구나, 결과 확인
-		assertThatThrownBy(() -> memberService.update(1L, memberUpdateRequest))
-				.isInstanceOf(DuplicateEmailException.class);
-
-	}
-
-	@Test
-	@DisplayName("회원 삭제 성공")
-	public void delete() throws Exception {
-		Member savedMember = Member.builder()
-				.id(1L)
-				.username("홍길동")
-				.email("email@naver.com")
-				.password("1234")
-				.build();
-		given(memberRepository.findById(1L)).willReturn(Optional.of(savedMember));
-
-		// 에러 발생하지 않으면 삭제 됨
-		assertDoesNotThrow(() -> memberService.delete(savedMember.getId()));
+			// then
+			assertThatThrownBy(() -> memberService.delete(1L))
+					.isInstanceOf(ConstraintViolationMemberException.class)
+					.hasMessage("회원탈퇴 이전에 보유하신 식당을 삭제해주세요.");
+		}
 	}
 
 }
