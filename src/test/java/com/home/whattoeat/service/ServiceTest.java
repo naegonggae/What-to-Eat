@@ -28,7 +28,7 @@ public class ServiceTest {
 	@Mock
 	ReplyRepository replyRepository;
 
-	public Member member = member = new Member(
+	public Member member = new Member(
 			1L, "홍길동", "naver@naver.com", "1234",
 			"010-1234-1234", MemberRole.USER, null);
 

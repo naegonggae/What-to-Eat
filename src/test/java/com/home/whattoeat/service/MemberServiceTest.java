@@ -31,13 +31,6 @@ class MemberServiceTest extends ServiceTest {
 	@InjectMocks // mock 들을 의존성 주입해줌
 	private MemberService memberService;
 
-	@BeforeEach
-	void setUp() {
-		member = new Member(
-				1L, "홍길동", "naver@naver.com", "1234",
-				"010-1234-1234", MemberRole.USER, null);
-	}
-
 	@Nested
 	@DisplayName("saveMember 메서드는")
 	class SaveMemberCase {
