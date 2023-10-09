@@ -8,6 +8,8 @@ import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.MemberRole;
 import com.home.whattoeat.domain.Menu;
 import com.home.whattoeat.domain.Order;
+import com.home.whattoeat.domain.OrderMenu;
+import com.home.whattoeat.domain.OrderStatus;
 import com.home.whattoeat.domain.Restaurant;
 import com.home.whattoeat.domain.RestaurantCategory;
 import com.home.whattoeat.domain.RestaurantStatus;
@@ -23,6 +25,7 @@ import com.home.whattoeat.repository.RestaurantCategoryRepository;
 import com.home.whattoeat.repository.ReviewRepository;
 import com.home.whattoeat.repository.order.OrderRepository;
 import com.home.whattoeat.repository.restaurant.RestaurantRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -100,4 +103,18 @@ public class ServiceTest {
 	public Cart cart = new Cart(1L, cartMenuList, member);
 	public CartMenu cartMenu = new CartMenu(cart, menu, 10, 6000);
 	public CartMenu cartMenu2 = new CartMenu(1L, 10, 6000, cart, menu);
+	List<CartMenu> cartMenuList2 = new ArrayList<>(){{ add(cartMenu2);}};
+	public Cart cart2 = new Cart(1L, cartMenuList2, member);
+	// Order //
+	List<OrderMenu> orderMenuList = new ArrayList<>();
+	public Order order = new Order(
+			1L, "케챱 많이 주세요.", 60000,
+			LocalDateTime.of(2023,10, 9, 19, 8), OrderStatus.ORDER,
+			member, restaurant, orderMenuList, null);
+	List<OrderMenu> orderMenuList2 = new ArrayList<>();
+	public Order order2 = new Order(
+			2L, "배고프니 빨리 배달해주세요.", 60000,
+			LocalDateTime.of(2023,10, 9, 19, 8), OrderStatus.ORDER,
+			member2, restaurant2, orderMenuList2, null);
+
 }
