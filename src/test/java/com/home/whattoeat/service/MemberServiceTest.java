@@ -9,7 +9,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.home.whattoeat.domain.MemberRole;
 import com.home.whattoeat.dto.member.MemberFindResponse;
 import com.home.whattoeat.dto.member.MemberSaveRequest;
 import com.home.whattoeat.dto.member.MemberSaveResponse;
@@ -20,7 +19,6 @@ import com.home.whattoeat.exception.member.DuplicateEmailException;
 import com.home.whattoeat.exception.member.DuplicateUsernameException;
 import com.home.whattoeat.exception.member.NoSuchMemberException;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

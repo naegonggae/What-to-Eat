@@ -288,7 +288,7 @@ class RestaurantServiceTest extends ServiceTest {
 
 		// given
 		List<String> cs = new ArrayList<>() {{
-			add("햄버거");
+			add("피자");
 			add("패스트푸드");
 			add("식사용");
 		}};
@@ -301,31 +301,30 @@ class RestaurantServiceTest extends ServiceTest {
 		@DisplayName("restaurant 수정 성공")
 		public void success_update() {
 
-			// UnsupportedOperationException
 			// when
-//			when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
-//			when(categoryRepository.findByName(request.getCategoryNames().get(0))).thenReturn(Optional.of(category));
-//			when(rcRepository.existsByRestaurant(any(Restaurant.class))).thenReturn(true);
-//			when(categoryRepository.findByName(request.getCategoryNames().get(1))).thenReturn(Optional.of(category2));
-//			when(categoryRepository.findByName(request.getCategoryNames().get(2))).thenReturn(Optional.of(category3));
-//
-//			// then
-//			restaurantService.update(1L, request, member.getUsername());
-////			RstFindResponse result = restaurantService.findOne(1L);
-//
-//			verify(rcRepository, times(1)).deleteAllByRestaurant(restaurant);
-//			assertThat(result.getId()).isEqualTo(1L);
-//			assertThat(result.getName()).isEqualTo("맘스터치");
-//			assertThat(result.getPhoneNumber()).isEqualTo("010-9999-1234");
-//			assertThat(result.getDescription()).isEqualTo("맘스터치 입니다.");
-//			assertThat(result.getAddress().getCity()).isEqualTo("안양시");
-//			assertThat(result.getAddress().getStreet()).isEqualTo("삼덕로");
-//			assertThat(result.getAddress().getZipcode()).isEqualTo("123-123");
-//			assertThat(result.getStarRating()).isEqualTo(0.0);
-//			assertThat(result.getNumberOfOrders()).isEqualTo(0L);
-//			assertThat(result.getMinOrderAmount()).isEqualTo(2000);
-//			assertThat(result.getMaxOrderAmount()).isEqualTo(20000);
-//			assertThat(result.getReviewCount()).isEqualTo(0);
+			when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
+			when(rcRepository.existsByRestaurant(any(Restaurant.class))).thenReturn(true);
+			when(categoryRepository.findByName("피자")).thenReturn(Optional.of(category4));
+			when(categoryRepository.findByName(request.getCategoryNames().get(1))).thenReturn(Optional.of(category2));
+			when(categoryRepository.findByName(request.getCategoryNames().get(2))).thenReturn(Optional.of(category3));
+
+			// then
+			restaurantService.update(1L, request, member.getUsername());
+			RstFindResponse result = restaurantService.findOne(1L);
+
+			verify(rcRepository, times(3)).deleteAllByRestaurant(restaurant);
+			assertThat(result.getId()).isEqualTo(1L);
+			assertThat(result.getName()).isEqualTo("맘스터치");
+			assertThat(result.getPhoneNumber()).isEqualTo("010-9999-1234");
+			assertThat(result.getDescription()).isEqualTo("맘스터치 입니다.");
+			assertThat(result.getAddress().getCity()).isEqualTo("안양시");
+			assertThat(result.getAddress().getStreet()).isEqualTo("삼덕로");
+			assertThat(result.getAddress().getZipcode()).isEqualTo("123-123");
+			assertThat(result.getStarRating()).isEqualTo(0.0);
+			assertThat(result.getNumberOfOrders()).isEqualTo(0L);
+			assertThat(result.getMinOrderAmount()).isEqualTo(2000);
+			assertThat(result.getMaxOrderAmount()).isEqualTo(20000);
+			assertThat(result.getReviewCount()).isEqualTo(0);
 		}
 
 		@Test
