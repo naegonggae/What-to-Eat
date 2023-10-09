@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor(access = PROTECTED)
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 public class Reply extends BaseEntity {
 

@@ -130,5 +130,8 @@ public class ServiceTest {
 	public Comment comment = new Comment(1L, "공감해요", member, review, replyList);
 	List<Reply> replyList2 = new ArrayList<>();
 	public Comment comment2 = new Comment(2L, "공감안해요", member2, review, replyList2);
+	// Reply //
+	public Reply reply = new Reply(1L, "저도요", member, comment);
+	public Reply reply2 = new Reply(2L, "난아님", member, comment);
 
 }
