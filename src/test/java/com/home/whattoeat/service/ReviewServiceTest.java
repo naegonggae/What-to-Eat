@@ -154,7 +154,7 @@ class ReviewServiceTest extends ServiceTest {
 		}
 
 		@Test
-		@DisplayName("로그인한 유저와 식당을 만든 유저가 다를때 review 수정 실패")
+		@DisplayName("로그인한 유저와 리뷰를 만든 유저가 다를때 review 수정 실패")
 		public void fail3_update() {
 			// when
 			when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
@@ -197,7 +197,7 @@ class ReviewServiceTest extends ServiceTest {
 		}
 
 		@Test
-		@DisplayName("존재하지 않는 메뉴를 삭제할때 review 삭제 실패")
+		@DisplayName("존재하지 않는 리뷰를 삭제할때 review 삭제 실패")
 		public void fail2_delete() {
 			// when
 			when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
@@ -210,7 +210,7 @@ class ReviewServiceTest extends ServiceTest {
 		}
 
 		@Test
-		@DisplayName("로그인한 유저와 식당을 만든 유저가 다를때 review 삭제 실패")
+		@DisplayName("로그인한 유저와 리뷰를 만든 유저가 다를때 review 삭제 실패")
 		public void fail3_delete() {
 			// when
 			when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));

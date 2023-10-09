@@ -11,6 +11,7 @@ import com.home.whattoeat.domain.Menu;
 import com.home.whattoeat.domain.Order;
 import com.home.whattoeat.domain.OrderMenu;
 import com.home.whattoeat.domain.OrderStatus;
+import com.home.whattoeat.domain.Reply;
 import com.home.whattoeat.domain.Restaurant;
 import com.home.whattoeat.domain.RestaurantCategory;
 import com.home.whattoeat.domain.RestaurantStatus;
@@ -124,5 +125,10 @@ public class ServiceTest {
 	List<Comment> commentList2 = new ArrayList<>();
 	public Review review2 = new Review(
 			2L, "정말 맛없어요.", 1.0, restaurant, commentList2, member2);
+	// Comment //
+	List<Reply> replyList = new ArrayList<>();
+	public Comment comment = new Comment(1L, "공감해요", member, review, replyList);
+	List<Reply> replyList2 = new ArrayList<>();
+	public Comment comment2 = new Comment(2L, "공감안해요", member2, review, replyList2);
 
 }
