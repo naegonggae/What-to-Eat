@@ -176,7 +176,7 @@ class MenuServiceTest extends ServiceTest {
 			when(restaurantRepository.findById(-1L)).thenThrow(NoSuchRestaurantException.class);
 
 			// then
-			assertThatThrownBy(() -> menuService.findOne(-1L, 1L))
+			assertThatThrownBy(() -> menuService.findAll(-1L, pageable))
 					.isInstanceOf(NoSuchRestaurantException.class)
 					.hasMessage("존재하지 않는 음식점입니다.");
 		}

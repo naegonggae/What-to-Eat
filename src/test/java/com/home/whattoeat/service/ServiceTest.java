@@ -4,6 +4,7 @@ import com.home.whattoeat.domain.Address;
 import com.home.whattoeat.domain.Cart;
 import com.home.whattoeat.domain.CartMenu;
 import com.home.whattoeat.domain.Category;
+import com.home.whattoeat.domain.Comment;
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.MemberRole;
 import com.home.whattoeat.domain.Menu;
@@ -116,5 +117,12 @@ public class ServiceTest {
 			2L, "배고프니 빨리 배달해주세요.", 60000,
 			LocalDateTime.of(2023,10, 9, 19, 8), OrderStatus.ORDER,
 			member2, restaurant2, orderMenuList2, null);
+	// Review //
+	List<Comment> commentList = new ArrayList<>();
+	public Review review = new Review(
+			1L, "정말 맛있어요.", 4.5, restaurant, commentList, member);
+	List<Comment> commentList2 = new ArrayList<>();
+	public Review review2 = new Review(
+			2L, "정말 맛없어요.", 1.0, restaurant, commentList2, member2);
 
 }
