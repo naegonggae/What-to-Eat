@@ -55,6 +55,10 @@ public class ServiceTest {
 	public Member member = new Member(
 			1L, "홍길동", "naver@naver.com", "1234",
 			"010-1234-1234", MemberRole.USER, orderList);
+	List<Order> orderList2 = new ArrayList<>();
+	public Member member2 = new Member(
+			2L, "유재석", "google@naver.com", "1234",
+			"010-9999-1234", MemberRole.USER, orderList2);
 	// Category //
 	public Category category = new Category(1L, "햄버거");
 	public Category category2 = new Category(2L, "패스트푸드");
