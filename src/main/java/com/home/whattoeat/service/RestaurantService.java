@@ -19,8 +19,10 @@ import com.home.whattoeat.exception.reataurant.DuplicateRestaurantException;
 import com.home.whattoeat.exception.reataurant.NoSuchRestaurantException;
 import com.home.whattoeat.repository.CategoryRepository;
 import com.home.whattoeat.repository.MenuRepository;
+import com.home.whattoeat.repository.RestaurantCategoryRepository;
 import com.home.whattoeat.repository.order.OrderRepository;
 import com.home.whattoeat.repository.restaurant.RestaurantRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class RestaurantService {
 
 	private final CategoryRepository categoryRepository;
 	private final RestaurantRepository restaurantRepository;
+	private final RestaurantCategoryRepository restaurantCategoryRepository;
 	private final MenuRepository menuRepository;
 	private final OrderRepository orderRepository;
 
@@ -48,7 +51,7 @@ public class RestaurantService {
 		if (existsByName) throw new DuplicateRestaurantException();
 
 		// 카테고리 String 리스트 -> RestaurantCategory 로 변경
-		List<RestaurantCategory> restaurantCategoryList = changeStringListToRestaurantCategoryList(
+		List<RestaurantCategory> restaurantCategoryList = createStringListToRestaurantCategoryList(
 				request.getCategoryNames());
 
 		// 식당 생성
@@ -93,11 +96,29 @@ public class RestaurantService {
 
 		// 카테고리 수정
 		List<RestaurantCategory> restaurantCategoryList = changeStringListToRestaurantCategoryList(
-				request.getCategoryNames());
+				request, restaurant);
 
 		restaurant.update(request, restaurantCategoryList);
+
 	}
 
+	private List<RestaurantCategory> changeStringListToRestaurantCategoryList(RstUpdateRequest request,
+			Restaurant restaurant) {
+		List<RestaurantCategory> restaurantCategoryList = request.getCategoryNames().stream()
+				.map(categoryName -> {
+					// 사용자가 입력한 카테고리 이름이 등록된 카테고리인지 확인
+					Category findCategory = categoryRepository.findByName(categoryName)
+							.orElseThrow(NoSuchCategoryException::new);
+					// 수정할때 있는거 다 비우기
+					boolean existsRC = restaurantCategoryRepository.existsByRestaurant(restaurant);
+					if (existsRC) {
+						restaurantCategoryRepository.deleteAllByRestaurant(restaurant);
+					}
+					return RestaurantCategory.createCategory(findCategory);
+				})
+				.collect(Collectors.toList());
+		return restaurantCategoryList;
+	}
 
 	// 식당 삭제
 	@Transactional
@@ -118,7 +139,7 @@ public class RestaurantService {
 		restaurantRepository.deleteById(id);
 	}
 
-	private List<RestaurantCategory> changeStringListToRestaurantCategoryList(List<String> categoryList) {
+	private List<RestaurantCategory> createStringListToRestaurantCategoryList(List<String> categoryList) {
 		List<RestaurantCategory> restaurantCategoryList = categoryList.stream()
 				.map(categoryName -> {
 					// 사용자가 입력한 카테고리 이름이 등록된 카테고리인지 확인
