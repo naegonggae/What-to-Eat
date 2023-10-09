@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor(access = PROTECTED)
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 public class Restaurant extends BaseEntity {
 
@@ -77,16 +77,23 @@ public class Restaurant extends BaseEntity {
 		this.phoneNumber = request.getPhoneNumber();
 		this.description = request.getDescription();
 		this.address = Address.createAddress(request.getCity(), request.getStreet(), request.getZipcode());
-		this.starRating = 0.0;
-		this.numberOfOrders = 0L;
 		this.minOrderAmount = request.getMinOrderAmount();
 		this.maxOrderAmount = request.getMaxOrderAmount();
 		for (RestaurantCategory rc : restaurantCategoryList) {
 			this.addRestaurantCategory(rc);
 		}
-		this.reviewCount = 0;
 		this.status = RestaurantStatus.OPEN;
 		this.member = member;
+
+		// data init X
+		this.starRating = 0.0;
+		this.numberOfOrders = 0L;
+		this.reviewCount = 0;
+
+		// data init O
+//		this.numberOfOrders = request.getNumberOfOrders();
+//		this.starRating = request.getStarRating();
+//		this.reviewCount = request.getReviewCount();
 	}
 
 	// 비즈니스 메서드 //
@@ -149,22 +156,4 @@ public class Restaurant extends BaseEntity {
 		this.numberOfOrders++;
 	}
 
-	// 데이터 용 생성자
-	public Restaurant(Long id, String name, String phoneNumber, String description, Address address,
-			Double starRating, Long numberOfOrders, Integer minOrderAmount, Integer maxOrderAmount,
-			Integer reviewCount, RestaurantStatus status,
-			List<RestaurantCategory> restaurantCategoryList) {
-		this.id = id;
-		this.name = name;
-		this.phoneNumber = phoneNumber;
-		this.description = description;
-		this.address = address;
-		this.starRating = starRating;
-		this.numberOfOrders = numberOfOrders;
-		this.minOrderAmount = minOrderAmount;
-		this.maxOrderAmount = maxOrderAmount;
-		this.reviewCount = reviewCount;
-		this.status = status;
-		this.restaurantCategoryList = restaurantCategoryList;
-	}
 }
