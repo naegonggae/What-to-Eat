@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor(access = PROTECTED)
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 public class CartMenu extends BaseEntity {
 

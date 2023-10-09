@@ -18,8 +18,9 @@ public class CartMenuService {
 
 	// cartMenu 생성 == 장바구니에 담는 구성품(하나의 메뉴 * 수량)
 	@Transactional
-	public void createCartMenu(CartSaveRequest request, Menu menu, Cart cart) {
+	public CartMenu createCartMenu(CartSaveRequest request, Menu menu, Cart cart) {
 		CartMenu cartMenu = CartMenu.createCartMenu(request, menu, cart);
-		cartMenuRepository.save(cartMenu);
+		CartMenu saveCartMenu = cartMenuRepository.save(cartMenu);
+		return saveCartMenu;
 	}
 }

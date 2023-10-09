@@ -1,6 +1,8 @@
 package com.home.whattoeat.service;
 
 import com.home.whattoeat.domain.Address;
+import com.home.whattoeat.domain.Cart;
+import com.home.whattoeat.domain.CartMenu;
 import com.home.whattoeat.domain.Category;
 import com.home.whattoeat.domain.Member;
 import com.home.whattoeat.domain.MemberRole;
@@ -10,6 +12,8 @@ import com.home.whattoeat.domain.Restaurant;
 import com.home.whattoeat.domain.RestaurantCategory;
 import com.home.whattoeat.domain.RestaurantStatus;
 import com.home.whattoeat.domain.Review;
+import com.home.whattoeat.repository.CartMenuRepository;
+import com.home.whattoeat.repository.CartRepository;
 import com.home.whattoeat.repository.CategoryRepository;
 import com.home.whattoeat.repository.CommentRepository;
 import com.home.whattoeat.repository.MemberRepository;
@@ -42,6 +46,10 @@ public class ServiceTest {
 	@Mock
 	MenuRepository menuRepository;
 	@Mock
+	CartRepository cartRepository;
+	@Mock
+	CartMenuRepository cartMenuRepository;
+	@Mock
 	OrderRepository orderRepository;
 	@Mock
 	ReviewRepository reviewRepository;
@@ -49,6 +57,8 @@ public class ServiceTest {
 	CommentRepository commentRepository;
 	@Mock
 	ReplyRepository replyRepository;
+	@Mock
+	CartMenuService cartMenuService;
 
 	// Member //
 	List<Order> orderList = new ArrayList<>();
@@ -85,5 +95,9 @@ public class ServiceTest {
 	// Menu //
 	public Menu menu = new Menu(1L, "빅맥", "빅맥입니다.", 6000, restaurant);
 	public Menu menu2 = new Menu(2L, "슈슈버거", "슈슈버거입니다.", 6500, restaurant);
-
+	// Cart //
+	List<CartMenu> cartMenuList = new ArrayList<>();
+	public Cart cart = new Cart(1L, cartMenuList, member);
+	public CartMenu cartMenu = new CartMenu(cart, menu, 10, 6000);
+	public CartMenu cartMenu2 = new CartMenu(1L, 10, 6000, cart, menu);
 }
